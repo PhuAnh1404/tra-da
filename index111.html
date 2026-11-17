@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lộ trình Tác động Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+/* Bố cục: hero hai cột với minh họa lớn, dải số liệu màu thương hiệu, các khối nội dung xen kẽ nền sáng và nền xanh nhạt; mỗi trang mở bằng banner minh họa */
+:root{
+  --bg:#F7F8F3; --surface:#FFFFFF; --soft:#E6EFE4; --soft2:#FFF1E4; --ink:#14231A; --muted:#5A6A5E;
+  --brand:#1E4D2B; --brand2:#2E7A45; --on-brand:#FFFFFF; --accent:#E0702A; --accent2:#F4A261; --line:#D8E0D6; --warn-bg:#FBE7D6;
+  --sky:#DCEBF2; --sand:#F2E7D3;
+  --font-display:"Fraunces","Be Vietnam Pro",Georgia,serif;
+  --font-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --radius:18px; --shadow:0 10px 30px rgba(20,35,26,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1813; --surface:#182319; --soft:#1F2D23; --soft2:#2E2419; --ink:#E9F0E8; --muted:#A3B3A6;
+    --brand:#2F7A46; --brand2:#3F9A5A; --accent:#F0914A; --accent2:#F4A261; --line:#2D3C32; --warn-bg:#3A2A1C;
+    --sky:#1E2E36; --sand:#2C2820; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1813; --surface:#182319; --soft:#1F2D23; --soft2:#2E2419; --ink:#E9F0E8; --muted:#A3B3A6;
+  --brand:#2F7A46; --brand2:#3F9A5A; --accent:#F0914A; --accent2:#F4A261; --line:#2D3C32; --warn-bg:#3A2A1C;
+  --sky:#1E2E36; --sand:#2C2820; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6}
+h1,h2,h3{line-height:1.15;text-wrap:balance;margin:0}
+h1{font-family:var(--font-display);font-size:clamp(2.1rem,5vw,3.6rem);font-weight:700;letter-spacing:-.01em}
+h2{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2.1rem);font-weight:600}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header.nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.navin{display:flex;align-items:center;gap:16px;padding:10px 20px;max-width:1120px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.1rem;text-decoration:none;color:var(--ink);white-space:nowrap}
+.logo svg{width:30px;height:30px}
+.links{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+.links a{text-decoration:none;font-size:.88rem;font-weight:500;padding:7px 11px;border-radius:999px;white-space:nowrap;color:var(--muted)}
+.links a:hover{background:var(--soft);color:var(--ink)}
+.links a.on{background:var(--brand);color:var(--on-brand)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;font:inherit;font-weight:600;padding:12px 22px;border-radius:999px;text-decoration:none;background:var(--brand);color:var(--on-brand);transition:transform .15s,filter .15s}
+.btn.alt{background:var(--accent);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.white{background:#fff;color:var(--brand)}
+.btn.sm{padding:8px 15px;font-size:.88rem}
+.btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
+main section.view{display:none}
+main section.view.on{display:block}
+.block{padding:52px 0}
+.block.soft{background:var(--soft)}
+.block.brand{background:var(--brand);color:var(--on-brand)}
+.block.brand .muted{color:rgba(255,255,255,.78)}
+.stack{display:flex;flex-direction:column;gap:28px}
+.lead{font-size:1.12rem;color:var(--muted);max-width:60ch}
+.eyebrow{font-size:.76rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:10px}
+.card.lift{box-shadow:var(--shadow);border-color:transparent}
+.card.soft{background:var(--soft);border-color:transparent}
+.card.brand{background:var(--brand);color:var(--on-brand);border-color:transparent}
+.card.brand .muted{color:rgba(255,255,255,.8)}
+.card .pic{margin:-22px -22px 6px;border-radius:var(--radius) var(--radius) 0 0;overflow:hidden;aspect-ratio:16/8;display:block}
+.card .pic svg{width:100%;height:100%;display:block}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--warn-bg);color:var(--accent);white-space:nowrap}
+.chip{display:inline-block;font-size:.8rem;padding:3px 10px;border-radius:999px;background:var(--soft);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:36px;align-items:center;padding:48px 0 28px}
+.hero .art{width:100%;height:auto;display:block;filter:drop-shadow(0 18px 30px rgba(20,35,26,.18))}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-top:28px}}
+.statband{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;border-radius:var(--radius);overflow:hidden;background:var(--brand);color:#fff}
+.statband div{padding:22px 24px;border-right:1px solid rgba(255,255,255,.15)}
+.statband div:last-child{border-right:0}
+.statband b{display:block;font-family:var(--font-display);font-size:2.6rem;line-height:1;color:var(--accent2);font-variant-numeric:tabular-nums}
+.statband span{font-size:.92rem;color:rgba(255,255,255,.88)}
+.statband i{display:block;font-style:normal;font-size:.76rem;color:rgba(255,255,255,.6);margin-top:4px}
+.ico{width:52px;height:52px;border-radius:14px;background:var(--soft2);display:grid;place-items:center}
+.ico svg{width:30px;height:30px}
+.steps{counter-reset:s}
+.steps .card{position:relative}
+.steps .card .num{position:absolute;top:16px;right:16px;font-family:var(--font-display);font-size:2.4rem;color:var(--line);line-height:1}
+ul.clean{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.path{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.9rem}
+.path span{background:var(--soft);padding:4px 10px;border-radius:8px}
+.path i{color:var(--muted);font-style:normal}
+.quote{display:grid;grid-template-columns:160px 1fr;gap:26px;align-items:center}
+.quote .avatar{width:160px;height:160px;border-radius:50%;overflow:hidden;background:var(--sand)}
+.quote .avatar svg{width:100%;height:100%;display:block}
+.quote blockquote{margin:0;font-family:var(--font-display);font-size:1.35rem;line-height:1.45;font-weight:600}
+@media (max-width:700px){.quote{grid-template-columns:1fr}.quote .avatar{width:120px;height:120px}}
+.partners{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.partners div{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:14px;text-align:center;font-size:.82rem;color:var(--muted);font-weight:600}
+.cta{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;background:var(--accent);color:#fff;border-radius:var(--radius);padding:28px 30px}
+@media (max-width:700px){.cta{grid-template-columns:1fr}}
+.cta h2{color:#fff}
+/* banner cho các trang trong */
+.banner{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;padding:36px 0 8px}
+.banner .art{width:100%;max-height:260px;display:block}
+@media (max-width:820px){.banner{grid-template-columns:1fr}.banner .art{max-height:200px}}
+/* quiz */
+.progress{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}
+.progress div{height:100%;background:var(--accent);transition:width .25s}
+@media (prefers-reduced-motion:reduce){.progress div{transition:none}}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.opt{font:inherit;text-align:left;cursor:pointer;padding:13px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.opt:hover{border-color:var(--brand)}
+.opt.sel{border-color:var(--brand);background:var(--soft);font-weight:600}
+.match{display:grid;grid-template-columns:90px 1fr;gap:16px;align-items:start}
+.pct{font-family:var(--font-display);font-size:1.9rem;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;text-align:center;background:var(--warn-bg);border-radius:14px;padding:14px 0}
+.bar{height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar div{height:100%;background:var(--brand)}
+.notice{background:var(--warn-bg);border-radius:12px;padding:14px 16px}
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tl div{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--brand);border-radius:12px;padding:12px;font-size:.9rem}
+.tl div.end{border-top-color:var(--accent)}
+.tl b{display:block}
+.tri{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:center}
+.tri .node{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tri .node svg{width:64px;height:64px}
+.tri .node.me{background:var(--brand);color:var(--on-brand);border-color:transparent}
+.tri .arr{font-size:.8rem;color:var(--muted);text-align:center;max-width:150px}
+@media (max-width:820px){.tri{grid-template-columns:1fr}.tri .arr{max-width:none}}
+.passport{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-radius:22px;padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:22px;box-shadow:var(--shadow)}
+@media (max-width:700px){.passport{grid-template-columns:1fr}}
+.passport .chip{background:rgba(255,255,255,.16);color:#fff}
+.passport hr{border:0;border-top:1px dashed rgba(255,255,255,.4);margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.scroll{overflow-x:auto}
+label{font-weight:600;font-size:.9rem;display:block;margin-bottom:4px}
+input,select{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:.84rem;color:var(--muted)}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-size:.92rem;max-width:90vw;display:none;z-index:30}
+.ctiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.ctile{font:inherit;text-align:left;cursor:pointer;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+.ctile:hover{border-color:var(--brand2);box-shadow:var(--shadow)}
+.ctile.sel{border-color:var(--brand);background:var(--soft)}
+.ctile .from{font-weight:700;font-size:1.02rem}
+.ctile .to{color:var(--brand2);font-weight:600;font-size:.92rem}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:stretch}
+.vs .mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:120px;text-align:center}
+@media (max-width:820px){.vs{grid-template-columns:1fr}}
+.side.impact{border:2px solid var(--brand2);box-shadow:var(--shadow)}
+.meter{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--soft) 0);flex:none}
+.meter span{width:84px;height:84px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:var(--font-display);font-size:1.55rem;font-weight:700;color:var(--accent)}
+.meter.sm{width:72px;height:72px}.meter.sm span{width:54px;height:54px;font-size:1.05rem}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:.88rem;cursor:pointer;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.tabs button.on{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.road{display:flex;flex-direction:column;gap:0;border-left:3px solid var(--line);margin:4px 0 4px 6px;padding-left:14px}
+.road div{position:relative;display:flex;flex-direction:column;padding:6px 0}
+.road div::before{content:"";position:absolute;left:-21px;top:12px;width:11px;height:11px;border-radius:50%;background:var(--brand2)}
+.road .yr{font-size:.74rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.loop{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.loop .node{position:relative;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.loop .node:not(:last-child)::after{content:"→";position:absolute;right:-14px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700}
+.loop .node .n{width:28px;height:28px;border-radius:8px;background:var(--soft);display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.loop .node.on{border-color:var(--accent);background:var(--soft2)}
+.loop .node.on .n{background:var(--accent);color:#fff}
+.loop .here{font-size:.75rem;font-weight:700;color:var(--accent)}
+.loopback{margin-top:10px;border:1.5px dashed var(--accent);border-radius:12px;padding:10px 14px;font-weight:600;color:var(--accent);text-align:center}
+@media (max-width:860px){.loop{grid-template-columns:1fr}.loop .node:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-16px;transform:translateX(-50%)}}
+</style>
+</head>
+<body>
+
+<!-- Bộ minh họa dùng lại -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <!-- Nhà máy / văn phòng -->
+  <symbol id="s-office" viewBox="0 0 120 120"><rect x="20" y="30" width="80" height="80" rx="6" fill="#2E7A45"/><rect x="30" y="42" width="14" height="14" rx="2" fill="#DCEBF2"/><rect x="53" y="42" width="14" height="14" rx="2" fill="#DCEBF2"/><rect x="76" y="42" width="14" height="14" rx="2" fill="#DCEBF2"/><rect x="30" y="64" width="14" height="14" rx="2" fill="#DCEBF2"/><rect x="53" y="64" width="14" height="14" rx="2" fill="#DCEBF2"/><rect x="76" y="64" width="14" height="14" rx="2" fill="#DCEBF2"/><rect x="50" y="86" width="20" height="24" rx="2" fill="#F4A261"/><path d="M20 30 L60 12 L100 30Z" fill="#1E4D2B"/></symbol>
+  <!-- Cộng đồng / ngôi làng -->
+  <symbol id="s-village" viewBox="0 0 120 120"><path d="M10 110 Q60 95 110 110Z" fill="#8BBF8E"/><path d="M25 70 L50 48 L75 70 V105 H25Z" fill="#F4A261"/><path d="M20 72 L50 44 L80 72" fill="none" stroke="#E0702A" stroke-width="6" stroke-linecap="round"/><rect x="43" y="82" width="14" height="23" rx="2" fill="#1E4D2B"/><path d="M70 85 L88 68 L106 85 V105 H70Z" fill="#DCEBF2"/><circle cx="95" cy="40" r="12" fill="#F2E7D3"/><circle cx="22" cy="38" r="9" fill="#8BBF8E"/><rect x="20" y="46" width="4" height="22" fill="#1E4D2B"/></symbol>
+  <!-- Người (chuyên viên tập sự) -->
+  <symbol id="s-person" viewBox="0 0 120 120"><circle cx="60" cy="36" r="20" fill="#F2E7D3"/><path d="M60 16 a20 20 0 0 1 20 20 h-8 a12 12 0 0 0 -24 0 h-8 a20 20 0 0 1 20 -20z" fill="#1E4D2B"/><path d="M26 112 c0 -30 14 -46 34 -46 s34 16 34 46z" fill="#E0702A"/><rect x="52" y="66" width="16" height="46" fill="#F4A261" opacity=".6"/></symbol>
+  <!-- La bàn -->
+  <symbol id="s-compass" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 10 L40 32 L32 54 L24 32Z" fill="#E0702A"/><path d="M32 10 L40 32 L24 32Z" fill="#F4A261"/><circle cx="32" cy="32" r="4" fill="currentColor"/></symbol>
+  <!-- Cúp -->
+  <symbol id="s-trophy" viewBox="0 0 64 64"><path d="M18 10 h28 v14 a14 14 0 0 1 -28 0z" fill="#F4A261"/><path d="M18 14 h-8 v6 a10 10 0 0 0 10 10" fill="none" stroke="#E0702A" stroke-width="4"/><path d="M46 14 h8 v6 a10 10 0 0 1 -10 10" fill="none" stroke="#E0702A" stroke-width="4"/><rect x="28" y="36" width="8" height="10" fill="#E0702A"/><rect x="20" y="46" width="24" height="8" rx="2" fill="#1E4D2B"/></symbol>
+  <!-- Nhóm người -->
+  <symbol id="s-team" viewBox="0 0 64 64"><circle cx="20" cy="22" r="9" fill="#F2E7D3"/><circle cx="44" cy="22" r="9" fill="#F2E7D3"/><path d="M6 52 c0 -14 6 -20 14 -20 s14 6 14 20z" fill="#2E7A45"/><path d="M30 52 c0 -14 6 -20 14 -20 s14 6 14 20z" fill="#E0702A"/></symbol>
+  <!-- Hộ chiếu -->
+  <symbol id="s-passport" viewBox="0 0 64 64"><rect x="12" y="8" width="40" height="48" rx="5" fill="#1E4D2B"/><circle cx="32" cy="28" r="10" fill="none" stroke="#F4A261" stroke-width="3"/><path d="M22 28 h20 M32 18 v20 M25 21 q7 7 14 0 M25 35 q7 -7 14 0" stroke="#F4A261" stroke-width="2" fill="none"/><rect x="22" y="44" width="20" height="3" fill="#DCEBF2"/></symbol>
+  <!-- Cầu nối -->
+  <symbol id="s-bridge" viewBox="0 0 64 64"><path d="M4 44 Q32 14 60 44" fill="none" stroke="#E0702A" stroke-width="5" stroke-linecap="round"/><path d="M4 50 H60" stroke="#1E4D2B" stroke-width="5" stroke-linecap="round"/><path d="M16 50 V34 M32 50 V22 M48 50 V34" stroke="#1E4D2B" stroke-width="4"/></symbol>
+  <!-- Đồ thị tăng -->
+  <symbol id="s-chart" viewBox="0 0 64 64"><rect x="10" y="36" width="10" height="18" rx="2" fill="#8BBF8E"/><rect x="27" y="26" width="10" height="28" rx="2" fill="#2E7A45"/><rect x="44" y="14" width="10" height="40" rx="2" fill="#E0702A"/><path d="M8 30 L30 18 L50 8" fill="none" stroke="#1E4D2B" stroke-width="3" stroke-linecap="round"/></symbol>
+  <!-- Lá -->
+  <symbol id="s-leaf" viewBox="0 0 64 64"><path d="M52 12 C30 12 14 28 14 52 C38 52 52 36 52 12z" fill="#2E7A45"/><path d="M14 52 L44 20" stroke="#DCEBF2" stroke-width="3" stroke-linecap="round"/></symbol>
+  <!-- Bắt tay -->
+  <symbol id="s-hands" viewBox="0 0 64 64"><path d="M8 30 L24 20 L34 30 L26 38z" fill="#F4A261"/><path d="M56 30 L40 20 L30 30 L38 38z" fill="#E0702A"/><path d="M26 38 L32 44 L40 36" fill="none" stroke="#1E4D2B" stroke-width="4" stroke-linecap="round"/></symbol>
+</defs>
+</svg>
+
+<header class="nav">
+  <div class="navin">
+    <a class="logo" href="#trang-chu"><svg viewBox="0 0 64 64"><use href="#s-bridge"/></svg>Lộ trình Tác động</a>
+    <nav class="links" aria-label="Điều hướng chính">
+      <a href="#nghe">So sánh nghề</a>
+      <a href="#lo-trinh">Định hướng</a>
+      <a href="#cuoc-thi">Cuộc thi</a>
+      <a href="#squad">Nhóm Dự án</a>
+      <a href="#fellowship">Chuyên viên Tập sự</a>
+      <a href="#hanh-trinh">Hành trình</a>
+      <a href="#doi-tac">Đối tác</a>
+      <a href="#gioi-thieu">Về chương trình</a>
+    </nav>
+    <a class="btn sm alt" href="#lo-trinh">Bắt đầu</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= TRANG CHỦ ================= -->
+<section class="view" id="v-trang-chu">
+<div class="wrap">
+  <div class="hero">
+    <div class="stack" style="gap:18px">
+      <span class="eyebrow">Định hướng nghề nghiệp cho sinh viên kinh tế</span>
+      <h1>Nghề bạn đang nhắm tới đều có một hướng đi bền vững</h1>
+      <p class="lead">Bạn muốn làm kiểm toán, tài chính, marketing hay xuất nhập khẩu? Xem hướng bền vững (ESG) của chính nghề đó: làm gì mỗi tuần, mất bao nhiêu năm để lên từng vị trí, và bạn dùng lại được bao nhiêu kỹ năng đang có.</p>
+      <div class="row"><a class="btn alt" href="#lo-trinh">Chọn nghề của bạn</a><a class="btn ghost" href="#nghe">So sánh các nghề</a></div>
+      <div class="row small muted"><span>Không cần CV</span><span>·</span><span>Không hỏi bảng điểm</span><span>·</span><span>2 phút</span></div>
+    </div>
+    <svg class="art" viewBox="0 0 520 400" role="img" aria-label="Minh họa: một người trẻ đứng trên cây cầu nối hướng truyền thống và hướng bền vững">
+      <defs><linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#DCEBF2"/><stop offset="1" stop-color="#F7F8F3"/></linearGradient></defs>
+      <rect width="520" height="400" rx="28" fill="url(#sky)"/>
+      <circle cx="430" cy="80" r="40" fill="#F4A261" opacity=".9"/>
+      <path d="M0 300 Q130 250 260 300 T520 300 V400 H0Z" fill="#8BBF8E"/>
+      <path d="M0 330 Q130 290 260 330 T520 330 V400 H0Z" fill="#2E7A45"/>
+      <g transform="translate(40,120) scale(1.35)"><use href="#s-office" width="120" height="120"/></g>
+      <g transform="translate(330,150) scale(1.3)"><use href="#s-village" width="120" height="120"/></g>
+      <path d="M150 290 Q260 190 370 290" fill="none" stroke="#E0702A" stroke-width="12" stroke-linecap="round"/>
+      <path d="M140 300 H380" stroke="#1E4D2B" stroke-width="12" stroke-linecap="round"/>
+      <path d="M190 300 V258 M260 300 V240 M330 300 V258" stroke="#1E4D2B" stroke-width="8"/>
+      <g transform="translate(212,160) scale(0.85)"><use href="#s-person" width="120" height="120"/></g>
+      <g transform="translate(46,36)"><rect width="170" height="46" rx="12" fill="#fff" opacity=".95"/><text x="14" y="20" font-family="Be Vietnam Pro,sans-serif" font-size="11" fill="#5A6A5E">Nghề bạn chọn</text><text x="14" y="36" font-family="Be Vietnam Pro,sans-serif" font-size="13" font-weight="700" fill="#1E4D2B">Kỹ năng bạn đang có</text></g>
+      <g transform="translate(310,36)"><rect width="170" height="46" rx="12" fill="#fff" opacity=".95"/><text x="14" y="20" font-family="Be Vietnam Pro,sans-serif" font-size="11" fill="#5A6A5E">Hướng bền vững (ESG)</text><text x="14" y="36" font-family="Be Vietnam Pro,sans-serif" font-size="13" font-weight="700" fill="#E0702A">Thêm ý nghĩa, vẫn ổn định</text></g>
+    </svg>
+  </div>
+</div>
+
+<div class="block soft"><div class="wrap stack">
+  <div class="stack" style="gap:8px"><span class="eyebrow">Bắt đầu từ nghề bạn muốn</span><h2>Nghề của bạn, hướng bền vững</h2><p class="muted" style="max-width:62ch">Chọn một nghề để xem hai con đường đặt cạnh nhau và bạn dùng lại được bao nhiêu kỹ năng.</p></div>
+  <div class="ctiles" id="homeTiles"></div>
+</div></div>
+
+
+<div class="block"><div class="wrap stack">
+  <div class="stack" style="gap:8px"><span class="eyebrow">Vòng phát triển nghề nghiệp</span><h2>Chưa có kinh nghiệm hay đã có, bạn đều có điểm bắt đầu</h2></div>
+  <div class="grid g2">
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Bạn chưa có kinh nghiệm</span><h3>Được đào tạo trước, rồi mới vào việc</h3><ul class="clean muted"><li>Bắt đầu bằng Nhóm Dự án Tác động bán thời gian, hoặc Chuyên viên Tập sự có 4 tuần đào tạo nền tảng</li><li>Hai người hướng dẫn: một ở doanh nghiệp, một ở tổ chức xã hội</li><li>Hết 12 tháng, bạn có kinh nghiệm thật và Chứng nhận Lộ trình Tác động</li></ul></div>
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Bạn đã có kinh nghiệm</span><h3>Đi lộ trình nhanh</h3><ul class="clean muted"><li>Đã thực tập, làm dự án thật, làm bán thời gian hoặc đi làm dưới 1 năm</li><li>Vào thẳng vòng chung kết cuộc thi tình huống để xét Chuyên viên Tập sự</li><li>Hoặc nhận vai trò trưởng nhóm trong Nhóm Dự án Tác động</li></ul></div>
+  </div>
+  <div id="homeLoop"></div>
+</div></div>
+<div class="wrap" style="padding-top:52px">
+  <div class="statband">
+    <div><b>49%</b><span>người lao động Việt Nam được khảo sát đang cân nhắc đổi nghề</span><i>ManpowerGroup &amp; Jobs_that_makesense, 2024</i></div>
+    <div><b>0/50</b><span>nhà tuyển dụng sinh viên yêu thích nhất là tổ chức tác động xã hội</span><i>Anphabe, 2025</i></div>
+    <div><b>44%</b><span>doanh nghiệp đã triển khai sáng kiến ESG, ba năm trước là 28%</span><i>PwC Việt Nam, 2025</i></div>
+  </div>
+</div>
+
+<div class="block"><div class="wrap stack">
+  <div class="stack" style="gap:8px"><span class="eyebrow">Cách hoạt động</span><h2>Bốn bước từ nghề bạn biết đến một vai trò thật</h2></div>
+  <div class="grid g4 steps">
+    <div class="card lift"><span class="num">01</span><div class="ico" style="color:#1E4D2B"><svg viewBox="0 0 64 64"><use href="#s-compass"/></svg></div><h3>Chọn nghề</h3><p class="muted">Bắt đầu từ nghề bạn đang nhắm tới, chưa cần biết gì về ESG.</p></div>
+    <div class="card lift"><span class="num">02</span><div class="ico"><svg viewBox="0 0 64 64"><use href="#s-leaf"/></svg></div><h3>Thấy hướng bền vững</h3><p class="muted">So sánh hai con đường, xem kỹ năng nào mang theo được, cần học thêm gì.</p></div>
+    <div class="card lift"><span class="num">03</span><div class="ico"><svg viewBox="0 0 64 64"><use href="#s-trophy"/></svg></div><h3>Thử sức</h3><p class="muted">Giải bài toán thật trong cuộc thi tình huống, hoặc tham gia Nhóm Dự án Tác động bán thời gian.</p></div>
+    <div class="card lift"><span class="num">04</span><div class="ico"><svg viewBox="0 0 64 64"><use href="#s-passport"/></svg></div><h3>Vào nghề</h3><p class="muted">Nhận suất Chuyên viên Tập sự Tác động 12 tháng, có phụ cấp từ doanh nghiệp và hai người hướng dẫn.</p></div>
+  </div>
+</div></div>
+
+<div class="block soft"><div class="wrap stack">
+  <div class="stack" style="gap:8px"><span class="eyebrow">Hai lối vào</span><h2>Chọn nhịp phù hợp với bạn</h2></div>
+  <div class="grid g2">
+    <div class="card lift"><div class="pic"><svg viewBox="0 0 400 200"><rect width="400" height="200" fill="#DCEBF2"/><circle cx="330" cy="50" r="28" fill="#F4A261"/><path d="M0 160 Q100 120 200 160 T400 160 V200 H0Z" fill="#8BBF8E"/><g transform="translate(60,60) scale(1.3)"><use href="#s-team" width="64" height="64"/></g><g transform="translate(200,50) scale(1.5)"><use href="#s-chart" width="64" height="64"/></g></svg></div><div class="row"><h3>Nhóm Dự án Tác động</h3><span class="chip">Bán thời gian · 3 tháng</span></div><p class="muted">Giữ việc học hoặc công việc đang làm. Làm theo nhóm, giải một bài toán thật cho tổ chức xã hội, có chuyên gia doanh nghiệp hướng dẫn.</p><a class="btn sm" href="#squad" style="align-self:flex-start">Tìm hiểu Nhóm Dự án</a></div>
+    <div class="card lift"><div class="pic"><svg viewBox="0 0 400 200"><rect width="400" height="200" fill="#F2E7D3"/><path d="M0 170 Q100 140 200 170 T400 170 V200 H0Z" fill="#2E7A45"/><g transform="translate(40,40) scale(1.1)"><use href="#s-office" width="120" height="120"/></g><g transform="translate(250,50) scale(1.1)"><use href="#s-village" width="120" height="120"/></g><path d="M150 150 Q200 100 250 150" fill="none" stroke="#E0702A" stroke-width="8" stroke-linecap="round"/><g transform="translate(176,70) scale(.45)"><use href="#s-person" width="120" height="120"/></g></svg></div><div class="row"><h3>Chuyên viên Tập sự Tác động</h3><span class="chip">Toàn thời gian · 12 tháng</span></div><p class="muted">Ký hợp đồng với doanh nghiệp tiếp nhận, làm ở bộ phận ESG và làm dự án tại tổ chức xã hội đối tác của chính doanh nghiệp đó.</p><a class="btn sm" href="#fellowship" style="align-self:flex-start">Tìm hiểu Chuyên viên Tập sự</a></div>
+  </div>
+</div></div>
+
+<div class="block"><div class="wrap stack">
+  <div class="quote">
+    <div class="avatar"><svg viewBox="0 0 120 120"><rect width="120" height="120" fill="#F2E7D3"/><g transform="translate(0,8)"><use href="#s-person" width="120" height="120"/></g></svg></div>
+    <div class="stack" style="gap:12px">
+      <div class="row"><span class="eyebrow">Câu chuyện chuyên viên tập sự</span><span class="tag">Nhân vật minh họa</span></div>
+      <blockquote>"Mình vào trang để tìm việc xuất nhập khẩu. Hóa ra phần lớn kỹ năng của mình dùng được cho chuỗi cung ứng bền vững. Mình chưa có kinh nghiệm, nên bắt đầu từ Chuyên viên Tập sự. Giờ mình làm truy xuất nguồn gốc cho doanh nghiệp, và mỗi tuần một ngày rưỡi đi cùng nhóm sinh kế nông hộ."</blockquote>
+      <p class="muted small">Linh, cử nhân Kinh doanh quốc tế · Chuyên viên tập sự tại Doanh nghiệp Nông sản xuất khẩu A và Tổ chức Sinh kế nông hộ B</p>
+      <a class="btn sm ghost" href="#hanh-trinh" style="align-self:flex-start">Xem hành trình của Linh</a>
+    </div>
+  </div>
+</div></div>
+
+<div class="block soft"><div class="wrap stack">
+  <div class="stack" style="gap:8px"><span class="eyebrow">Đơn vị đứng sau</span><h2>Liên minh Nhân tài Tác động</h2><p class="muted" style="max-width:65ch">12 thành viên: 1 quỹ tư nhân, 4 tổ chức phi lợi nhuận và doanh nghiệp xã hội, 6 doanh nghiệp có bộ phận phát triển bền vững, 1 quỹ đầu tư tác động. Liên minh là tổ chức giả định trong đề bài VIAC 2026.</p></div>
+  <div class="partners"><div>Quỹ tư nhân</div><div>Doanh nghiệp FMCG</div><div>Nông sản xuất khẩu</div><div>Ngân hàng</div><div>tổ chức xã hội sinh kế</div><div>Doanh nghiệp xã hội</div><div>Quỹ đầu tư tác động</div><div>+ 5 thành viên</div></div>
+  <div class="cta"><div><h2>Nghề của bạn có hướng bền vững nào?</h2><p>Chọn nghề, xem hai con đường, nhận gợi ý trong 2 phút.</p></div><a class="btn white" href="#lo-trinh">Bắt đầu ngay</a></div>
+</div></div>
+</section>
+
+<!-- ================= SO SÁNH NGHỀ ================= -->
+<section class="view" id="v-nghe"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><span class="eyebrow">So sánh nghề</span><h1>Một nghề, hai con đường</h1><p class="lead">Chọn nghề bạn đang nhắm tới. Bên trái là hướng quen thuộc, bên phải là hướng bền vững của chính nghề đó, kèm mốc thời gian để lên từng vị trí.</p><div class="row"><span class="tag">Minh họa</span><span class="muted small">Chức danh, thu nhập và tỷ lệ kỹ năng là ví dụ. Bản thật dùng số liệu do thành viên Liên minh công bố.</span></div></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#E6EFE4"/><g transform="translate(30,60) scale(1.1)"><use href="#s-office" width="120" height="120"/></g><g transform="translate(250,70) scale(1.1)"><use href="#s-village" width="120" height="120"/></g><g transform="translate(160,80) scale(1.2)"><use href="#s-bridge" width="64" height="64"/></g><text x="34" y="235" font-family="Be Vietnam Pro" font-size="12" fill="#5A6A5E">Hướng truyền thống</text><text x="250" y="235" font-family="Be Vietnam Pro" font-size="12" fill="#E0702A" font-weight="700">Hướng bền vững</text></svg>
+  </div>
+  <div class="tabs" id="careerTabs" role="tablist" aria-label="Chọn nghề"></div>
+  <div id="compareBox"></div>
+  <div class="card brand"><div class="row"><div class="ico" style="background:rgba(255,255,255,.15)"><svg viewBox="0 0 64 64"><use href="#s-bridge"/></svg></div><h3>Ổn định đến đâu?</h3></div><p>Chuyên viên tập sự ký hợp đồng và nhận phụ cấp từ doanh nghiệp tiếp nhận, nên thu nhập không phụ thuộc vào tài trợ theo dự án. Sau 12 tháng có hai hướng: ở lại bộ phận ESG của doanh nghiệp, hoặc chuyển sang tổ chức xã hội với kinh nghiệm thật ở cả hai phía.</p></div>
+</div></section>
+
+<!-- ================= ĐỊNH HƯỚNG ================= -->
+<section class="view" id="v-lo-trinh"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><span class="eyebrow">Định hướng nghề</span><h1>Từ nghề bạn muốn đến một việc làm ESG</h1><p class="lead">Chọn nghề, xem hướng bền vững của nghề đó, cho biết bạn đã có kinh nghiệm hay chưa. Hệ thống ghép bạn với cặp doanh nghiệp và tổ chức xã hội phù hợp nhất. Không hỏi bảng điểm.</p></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#FFF1E4"/><g transform="translate(40,50) scale(1.3)"><use href="#s-person" width="120" height="120"/></g><g transform="translate(230,40)"><rect width="140" height="34" rx="10" fill="#fff"/><text x="12" y="22" font-family="Be Vietnam Pro" font-size="12" font-weight="700" fill="#1E4D2B">1. Nghề bạn muốn</text></g><g transform="translate(230,86)"><rect width="140" height="34" rx="10" fill="#fff"/><text x="12" y="22" font-family="Be Vietnam Pro" font-size="12" font-weight="700" fill="#1E4D2B">2. Hướng bền vững</text></g><g transform="translate(230,132)"><rect width="140" height="34" rx="10" fill="#fff"/><text x="12" y="22" font-family="Be Vietnam Pro" font-size="12" font-weight="700" fill="#1E4D2B">3. Kinh nghiệm của bạn</text></g><g transform="translate(230,186)"><rect width="140" height="44" rx="12" fill="#E0702A"/><text x="12" y="19" font-family="Be Vietnam Pro" font-size="11" fill="#fff">Mức phù hợp</text><text x="12" y="37" font-family="Fraunces,serif" font-size="18" font-weight="700" fill="#fff">90%</text></g></svg>
+  </div>
+  <div class="card soft"><span class="small muted">Chạy nhanh bằng hồ sơ mẫu</span><div class="row" id="presets"></div></div>
+  <div class="card lift" id="quiz"></div>
+  <div id="result" class="stack" style="gap:16px"></div>
+</div></section>
+
+<!-- ================= CUỘC THI ================= -->
+<section class="view" id="v-cuoc-thi"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><span class="eyebrow">Cuộc thi Tuyển dụng qua Tình huống</span><h1>Cuộc thi mà giải thưởng là một việc làm</h1><p class="lead">Mỗi đề bài do một cặp doanh nghiệp và tổ chức xã hội đặt ra từ nhu cầu thật của họ. Đội thắng nhận suất Chuyên viên Tập sự Tác động ngay tại chung kết, do chính cặp đơn vị đó trao.</p></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#DCEBF2"/><path d="M0 220 Q200 190 400 220 V260 H0Z" fill="#8BBF8E"/><g transform="translate(150,30) scale(1.6)"><use href="#s-trophy" width="64" height="64"/></g><g transform="translate(40,120) scale(1.3)"><use href="#s-team" width="64" height="64"/></g><g transform="translate(260,120) scale(1.3)"><use href="#s-team" width="64" height="64"/></g><g transform="translate(150,135) scale(1.3)"><use href="#s-team" width="64" height="64"/></g></svg>
+  </div>
+  <div class="stack" style="gap:10px"><div class="row"><h2>Lịch thi</h2><span class="tag">Thời gian minh họa</span></div>
+    <div class="tl"><div><b>Đăng ký</b>Lập đội 3–4 người</div><div><b>Vòng 1</b>Nộp giải pháp, 2 tuần</div><div><b>Trại huấn luyện</b>Đào tạo và hướng dẫn, 1 tuần</div><div><b>Chung kết</b>Trình bày trước cặp đơn vị ra đề</div><div class="end"><b>Trao suất Chuyên viên Tập sự</b>Cho đội thắng mỗi đề</div></div></div>
+  <div class="stack" style="gap:10px"><div class="row"><h2>Đề bài đợt này</h2><span class="tag">Tổ chức hư cấu</span></div><div class="grid g3" id="cases"></div></div>
+  <div class="stack" style="gap:10px"><h2>Câu hỏi thường gặp</h2><div class="grid g3">
+    <div class="card"><h3>Ai được tham gia?</h3><p class="muted">Sinh viên năm cuối và người tốt nghiệp chưa quá 1 năm, khối kinh tế và kinh doanh.</p></div>
+    <div class="card"><h3>Không cần nộp CV?</h3><p class="muted">Không. Bài giải của đội là hồ sơ. Cặp đơn vị ra đề chấm theo chất lượng giải pháp.</p></div>
+    <div class="card"><h3>Không thắng thì sao?</h3><p class="muted">Các đội vào chung kết được ưu tiên xếp vào Nhóm Dự án Tác động của đợt gần nhất.</p></div>
+  </div></div>
+</div></section>
+
+<!-- ================= SQUAD ================= -->
+<section class="view" id="v-squad"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><span class="eyebrow">Nhóm Dự án Tác động</span><h1>Tạo tác động thật mà không phải bỏ việc đang làm</h1><p class="lead">Một vai trò bán thời gian trong 3 tháng. Phù hợp nếu bạn còn đi học, hoặc vừa vào làm ở một tập đoàn, ngân hàng hay công ty kiểm toán và chưa muốn đổi hướng hẳn.</p></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#E6EFE4"/><g transform="translate(60,40) scale(1.1)"><use href="#s-office" width="120" height="120"/></g><g transform="translate(230,50) scale(1.6)"><use href="#s-team" width="64" height="64"/></g><g transform="translate(150,170) scale(1.1)"><use href="#s-hands" width="64" height="64"/></g><text x="60" y="235" font-family="Be Vietnam Pro" font-size="12" fill="#5A6A5E">Việc đang làm</text><text x="250" y="235" font-family="Be Vietnam Pro" font-size="12" fill="#5A6A5E">+ 6–8 giờ/tuần</text></svg>
+  </div>
+  <div class="grid g4">
+    <div class="card"><h3>Dành cho ai</h3><p class="muted">Sinh viên năm cuối. Người đi làm chưa quá 1 năm.</p></div>
+    <div class="card"><div class="row"><h3>Hình thức</h3><span class="tag">Minh họa</span></div><p class="muted">3 tháng, nhóm 4–5 người, khoảng 6–8 giờ mỗi tuần.</p></div>
+    <div class="card"><h3>Làm gì</h3><p class="muted">Giải một bài toán thật cho tổ chức xã hội, theo kiểu dự án tư vấn, có chuyên gia doanh nghiệp hướng dẫn.</p></div>
+    <div class="card"><h3>Nhận được gì</h3><p class="muted">Kinh nghiệm thực tế, chứng nhận, và ưu tiên xét tuyển Chuyên viên Tập sự.</p></div>
+  </div>
+  <div class="stack" style="gap:10px"><div class="row"><h2>Dự án mẫu</h2><span class="tag">Tổ chức hư cấu</span></div><div class="grid g3">
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Rác thải</span><h3>Kế hoạch truyền thông thu hồi bao bì</h3><p class="muted">Cho Doanh nghiệp xã hội Thu gom rác F, cố vấn từ Doanh nghiệp Hàng tiêu dùng E.</p><button class="btn sm" data-toast="Đã ghi nhận đăng ký Nhóm Dự án (bản minh họa, không gửi dữ liệu).">Đăng ký</button></div>
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Y tế cộng đồng</span><h3>Phân tích dữ liệu sàng lọc sức khỏe</h3><p class="muted">Cho Tổ chức Y tế cộng đồng P, cố vấn từ Chuỗi nhà thuốc O.</p><button class="btn sm" data-toast="Đã ghi nhận đăng ký Nhóm Dự án (bản minh họa, không gửi dữ liệu).">Đăng ký</button></div>
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Giáo dục</span><h3>Thiết kế khóa kỹ năng số 6 buổi</h3><p class="muted">Cho Tổ chức Kỹ năng số N, cố vấn từ Doanh nghiệp Thương mại điện tử M.</p><button class="btn sm" data-toast="Đã ghi nhận đăng ký Nhóm Dự án (bản minh họa, không gửi dữ liệu).">Đăng ký</button></div>
+  </div></div>
+</div></section>
+
+<!-- ================= FELLOWSHIP ================= -->
+<section class="view" id="v-fellowship"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><span class="eyebrow">Chuyên viên Tập sự Tác động</span><h1>Một suất, hai nơi tiếp nhận</h1><p class="lead">Mỗi suất Chuyên viên Tập sự do một doanh nghiệp và một tổ chức xã hội cùng tiếp nhận. Hai bên làm chung một vấn đề, nên không bên nào phải giành người với bên nào.</p></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#F2E7D3"/><path d="M0 215 Q200 180 400 215 V260 H0Z" fill="#2E7A45"/><g transform="translate(30,70) scale(1.1)"><use href="#s-office" width="120" height="120"/></g><g transform="translate(250,80) scale(1.1)"><use href="#s-village" width="120" height="120"/></g><path d="M150 200 Q200 130 250 200" fill="none" stroke="#E0702A" stroke-width="9" stroke-linecap="round"/><g transform="translate(170,70) scale(.55)"><use href="#s-person" width="120" height="120"/></g></svg>
+  </div>
+  <div class="tri">
+    <div class="node"><svg viewBox="0 0 120 120"><use href="#s-office"/></svg><h3>Doanh nghiệp</h3><p class="muted small">Bộ phận ESG, phát triển bền vững</p></div>
+    <div class="arr">Hợp đồng và phụ cấp &rarr;<br>&larr; Công việc ESG</div>
+    <div class="node me"><svg viewBox="0 0 120 120"><use href="#s-person"/></svg><h3>Chuyên viên tập sự</h3><p class="small">12 tháng</p></div>
+    <div class="arr">Dự án tác động &rarr;<br>&larr; Trải nghiệm thực địa</div>
+    <div class="node"><svg viewBox="0 0 120 120"><use href="#s-village"/></svg><h3>Tổ chức xã hội</h3><p class="muted small">Tổ chức phi chính phủ hoặc doanh nghiệp xã hội</p></div>
+  </div>
+  <div class="stack" style="gap:10px"><div class="row"><h2>Chương trình gồm gì</h2><span class="tag">Các con số là minh họa</span></div><div class="grid g3">
+    <div class="card"><h3>Thời gian</h3><p class="muted">12 tháng. Khoảng 70% ở bộ phận ESG của doanh nghiệp, 30% làm dự án tại tổ chức xã hội đối tác.</p></div>
+    <div class="card"><h3>Phụ cấp</h3><p class="muted">Do doanh nghiệp tiếp nhận chi trả. Tổ chức xã hội không phải trả phí.</p></div>
+    <div class="card"><h3>Hai người hướng dẫn</h3><p class="muted">Một ở doanh nghiệp, một ở tổ chức xã hội. Gặp định kỳ hai tuần một lần.</p></div>
+    <div class="card"><h3>Đào tạo chung</h3><p class="muted">Mỗi tháng một buổi cho toàn bộ chuyên viên tập sự: báo cáo ESG, đo lường tác động, quản lý dự án.</p></div>
+    <div class="card"><h3>Cam kết ba bên</h3><p class="muted">Ghi rõ tỷ lệ thời gian, đầu ra cần nộp và quyền lợi của chuyên viên tập sự.</p></div>
+    <div class="card"><h3>Sau 12 tháng</h3><p class="muted">Chứng nhận Lộ trình Tác động, ưu tiên phỏng vấn tại 12 thành viên Liên minh, và hai hướng đi tiếp.</p></div>
+  </div></div>
+  <div class="row"><a class="btn alt" href="#cuoc-thi">Vào bằng cuộc thi tình huống</a><a class="btn ghost" href="#hanh-trinh">Xem một năm của chuyên viên tập sự</a></div>
+</div></section>
+
+<!-- ================= HÀNH TRÌNH ================= -->
+<section class="view" id="v-hanh-trinh"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><div class="row"><span class="eyebrow">Hành trình chuyên viên tập sự</span><span class="tag">Tài khoản minh họa</span></div><h1>Xin chào, Linh</h1><p class="lead">Chuyên viên tập sự tại Doanh nghiệp Nông sản xuất khẩu A và Tổ chức Sinh kế nông hộ B. Tháng thứ 5 trên 12.</p></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#DCEBF2"/><circle cx="330" cy="60" r="30" fill="#F4A261"/><path d="M0 200 Q200 160 400 200 V260 H0Z" fill="#8BBF8E"/><g transform="translate(60,50) scale(1.3)"><use href="#s-person" width="120" height="120"/></g><g transform="translate(230,110) scale(1.0)"><use href="#s-village" width="120" height="120"/></g></svg>
+  </div>
+  <div class="tl"><div><b>Tháng 1</b>Nhập môn, ký cam kết ba bên</div><div><b>Tháng 2–6</b>Làm tại doanh nghiệp, khởi động dự án</div><div><b>Tháng 7</b>Đánh giá giữa kỳ</div><div><b>Tháng 8–11</b>Hoàn thiện dự án</div><div class="end"><b>Tháng 12</b>Trình bày kết quả, nhận Chứng nhận</div></div>
+  <div class="grid g3">
+    <div class="card"><h3>Việc tuần này</h3><ul class="clean muted"><li>Làm sạch dữ liệu truy xuất của 3 vùng trồng</li><li>Đi thực địa cùng Tổ chức B (thứ Năm)</li><li>Nộp bản nháp mục Chuỗi cung ứng của báo cáo ESG</li></ul></div>
+    <div class="card"><h3>Người hướng dẫn</h3><p><b>Chị Hà</b> <span class="muted">· Trưởng nhóm phát triển bền vững, Doanh nghiệp A</span></p><p><b>Anh Phong</b> <span class="muted">· Quản lý chương trình, Tổ chức B</span></p><p class="small muted">Buổi gặp kế tiếp: thứ Ba tuần sau</p></div>
+    <div class="card"><h3>Tiến độ dự án</h3><p class="muted small">Truy xuất nguồn gốc cho nông hộ nhỏ</p><div class="bar"><div style="width:42%"></div></div><p class="small">42% · đã khảo sát 180/430 hộ</p><p class="small muted">Đào tạo chung tháng này: Đo lường tác động xã hội</p></div>
+  </div>
+  <div class="stack" style="gap:10px"><h2>Chứng nhận Lộ trình Tác động</h2><p class="muted" style="max-width:65ch">Thứ chuyên viên tập sự mang theo sau 12 tháng. Xem trước bản của Linh.</p>
+  <div class="passport">
+    <div><div class="row"><svg style="width:40px;height:40px" viewBox="0 0 64 64"><use href="#s-passport"/></svg><span class="eyebrow" style="color:#FFD2AE">Chứng nhận Lộ trình Tác động</span></div><h2 style="margin-top:6px;color:#fff">Trần Khánh Linh</h2><p class="small" style="opacity:.85">Doanh nghiệp Nông sản xuất khẩu A + Tổ chức Sinh kế nông hộ B</p><hr><p><b>Dự án:</b> truy xuất nguồn gốc và nâng thu nhập cho nông hộ nhỏ</p><div class="row" style="margin-top:10px"><span class="chip">Phân tích dữ liệu</span><span class="chip">Báo cáo ESG</span><span class="chip">Làm việc thực địa</span><span class="chip">Quản lý dự án</span></div></div>
+    <div><p style="font-weight:700;font-size:1.05rem">Được 12 thành viên Liên minh Nhân tài Tác động công nhận. Ưu tiên phỏng vấn tại tất cả thành viên.</p><p class="small" style="opacity:.8;margin-top:4px">Ưu tiên phỏng vấn, không bảo đảm có việc làm.</p><hr><p><b>Hướng 1:</b> ở lại làm Chuyên viên ESG tại doanh nghiệp tiếp nhận</p><p><b>Hướng 2:</b> chuyển sang làm Cán bộ dự án tại tổ chức xã hội</p></div>
+  </div></div>
+  <div class="stack" style="gap:10px"><div class="row"><span class="eyebrow">Quay lại với Lộ trình Tác động</span><span class="tag">Vị trí minh họa, tổ chức hư cấu</span></div><h2>Cổng việc làm ESG cho cựu thành viên</h2><p class="muted" style="max-width:65ch">Sau 12 tháng, chuyên viên tập sự có kinh nghiệm thật. Cổng việc làm này đưa họ quay lại chương trình để nhận việc ESG tại thành viên và đối tác của Liên minh, và mời họ làm người hướng dẫn cho khóa sau.</p>
+  <div class="grid g3">
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Ưu tiên người có Chứng nhận Lộ trình Tác động</span><h3>Chuyên viên tài chính xanh</h3><p class="muted small">Ngân hàng C · TP.HCM</p><p class="small">Thẩm định khoản vay xanh, chấm điểm rủi ro môi trường và xã hội.</p><button class="btn sm" data-toast="Đã ghi nhận ứng tuyển (bản minh họa, không gửi dữ liệu).">Ứng tuyển</button></div>
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Ưu tiên người có Chứng nhận Lộ trình Tác động</span><h3>Chuyên viên báo cáo ESG</h3><p class="muted small">Doanh nghiệp Xây dựng Q · TP.HCM</p><p class="small">Kiểm kê phát thải và soạn báo cáo phát triển bền vững.</p><button class="btn sm" data-toast="Đã ghi nhận ứng tuyển (bản minh họa, không gửi dữ liệu).">Ứng tuyển</button></div>
+    <div class="card lift"><span class="chip" style="align-self:flex-start">Ưu tiên người có Chứng nhận Lộ trình Tác động</span><h3>Cán bộ dự án sinh kế</h3><p class="muted small">Tổ chức Sinh kế nông hộ B · Đồng bằng sông Cửu Long</p><p class="small">Điều phối dự án nâng thu nhập cho nông hộ nhỏ.</p><button class="btn sm" data-toast="Đã ghi nhận ứng tuyển (bản minh họa, không gửi dữ liệu).">Ứng tuyển</button></div>
+  </div>
+  <div class="cta"><div><h2>Trở thành người hướng dẫn</h2><p>Cựu thành viên hướng dẫn một Nhóm Dự án Tác động của khóa sau, vòng phát triển tiếp tục với người mới.</p></div><button class="btn white" data-toast="Đã ghi nhận đăng ký làm người hướng dẫn (bản minh họa).">Đăng ký hướng dẫn</button></div></div>
+</div></section>
+
+<!-- ================= ĐỐI TÁC ================= -->
+<section class="view" id="v-doi-tac"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><span class="eyebrow">Dành cho đối tác</span><h1>Tuyển người trẻ làm ESG, cùng một tổ chức xã hội</h1><p class="lead">Doanh nghiệp có nhân sự được tuyển chọn và đào tạo sẵn. Tổ chức xã hội có người làm dự án mà không phải trả phí.</p></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#FFF1E4"/><g transform="translate(40,60) scale(1.1)"><use href="#s-office" width="120" height="120"/></g><g transform="translate(240,70) scale(1.1)"><use href="#s-village" width="120" height="120"/></g><g transform="translate(160,90) scale(1.3)"><use href="#s-hands" width="64" height="64"/></g></svg>
+  </div>
+  <div class="grid g2">
+    <div class="card lift"><div class="ico"><svg viewBox="0 0 64 64"><use href="#s-chart"/></svg></div><h3>Doanh nghiệp nhận được</h3><ul class="clean muted"><li>Nhân sự ESG đã qua vòng thi giải bài toán của chính mình</li><li>Một dự án tác động cụ thể để đưa vào báo cáo phát triển bền vững</li><li>Thương hiệu tuyển dụng với sinh viên</li></ul></div>
+    <div class="card lift"><div class="ico"><svg viewBox="0 0 64 64"><use href="#s-leaf"/></svg></div><h3>Tổ chức xã hội nhận được</h3><ul class="clean muted"><li>Nhân sự trẻ làm dự án, không mất phí</li><li>Quan hệ làm việc với một doanh nghiệp cùng lĩnh vực</li><li>Chuyên gia doanh nghiệp cố vấn qua Nhóm Dự án Tác động</li></ul></div>
+  </div>
+  <div class="stack" style="gap:10px"><h2>Quy trình</h2><div class="grid g4 steps">
+    <div class="card"><span class="num">01</span><h3>Đăng ký</h3><p class="muted small">Nêu vấn đề bạn muốn giải quyết.</p></div>
+    <div class="card"><span class="num">02</span><h3>Ghép cặp</h3><p class="muted small">Hội đồng độc lập ghép doanh nghiệp với tổ chức xã hội cùng vấn đề.</p></div>
+    <div class="card"><span class="num">03</span><h3>Ra đề</h3><p class="muted small">Hai bên cùng đặt đề bài cho cuộc thi tình huống.</p></div>
+    <div class="card"><span class="num">04</span><h3>Nhận chuyên viên tập sự</h3><p class="muted small">Ký cam kết ba bên, bắt đầu 12 tháng.</p></div>
+  </div></div>
+  <div class="card soft"><h3>Mô hình phí</h3><p style="max-width:70ch">Năm thí điểm 2027: Liên minh chi phần tuyển chọn, đào tạo và vận hành; doanh nghiệp trả phụ cấp cho chuyên viên tập sự của mình. Sau thí điểm: doanh nghiệp trả phí chương trình theo kết quả, tức là khi chuyên viên tập sự hoàn thành dự án hoặc ở lại làm việc.</p></div>
+  <div class="stack" style="gap:10px"><div class="row"><h2>Ứng viên phù hợp với đề bài của bạn</h2><span class="tag">Dữ liệu minh họa</span></div>
+    <div class="card scroll"><table><thead><tr><th>Ứng viên</th><th>Ngành</th><th>Kỹ năng khớp</th><th>Mức phù hợp</th></tr></thead><tbody>
+    <tr><td>Ứng viên 014</td><td>Kinh doanh quốc tế</td><td>Dữ liệu, quản lý dự án</td><td><b>90%</b></td></tr>
+    <tr><td>Ứng viên 031</td><td>Logistics</td><td>Dữ liệu, thực địa</td><td><b>90%</b></td></tr>
+    <tr><td>Ứng viên 007</td><td>Kinh tế</td><td>Quản lý dự án</td><td><b>80%</b></td></tr>
+    </tbody></table><p class="small muted">Góc nhìn của Doanh nghiệp Nông sản xuất khẩu A. Hồ sơ ẩn danh đến vòng chung kết.</p></div></div>
+  <form class="card" id="pform">
+    <h3>Đăng ký làm đối tác</h3>
+    <div class="grid g3">
+      <div><label for="f-org">Tên tổ chức</label><input id="f-org" required placeholder="Ví dụ: Công ty ABC"></div>
+      <div><label for="f-type">Loại hình</label><select id="f-type"><option>Doanh nghiệp có bộ phận ESG</option><option>Tổ chức phi chính phủ, phi lợi nhuận</option><option>Doanh nghiệp xã hội</option><option>Quỹ đầu tư tác động</option></select></div>
+      <div><label for="f-issue">Vấn đề quan tâm</label><select id="f-issue"></select></div>
+    </div>
+    <button class="btn" type="submit" style="align-self:flex-start">Gửi đăng ký</button>
+    <p class="small muted" id="pmsg">Đây là bản minh họa. Biểu mẫu không gửi dữ liệu đi đâu.</p>
+  </form>
+</div></section>
+
+<!-- ================= VỀ CHƯƠNG TRÌNH ================= -->
+<section class="view" id="v-gioi-thieu"><div class="wrap stack" style="padding-bottom:56px">
+  <div class="banner">
+    <div class="stack" style="gap:10px"><span class="eyebrow">Về chương trình</span><h1>Ai vận hành, phân bổ thế nào, đo bằng gì</h1><p class="lead">Minh bạch với người tham gia và với đối tác là điều kiện để chương trình chạy tiếp sau năm thí điểm.</p></div>
+    <svg class="art" viewBox="0 0 400 260"><rect width="400" height="260" rx="24" fill="#E6EFE4"/><g transform="translate(60,60) scale(1.6)"><use href="#s-bridge" width="64" height="64"/></g><g transform="translate(220,60) scale(1.6)"><use href="#s-chart" width="64" height="64"/></g></svg>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Đơn vị vận hành</h3><p class="muted">Liên minh Nhân tài Tác động, thành lập đầu năm 2026 tại TP.HCM: 1 quỹ tư nhân, 4 tổ chức phi lợi nhuận và doanh nghiệp xã hội, 6 doanh nghiệp có bộ phận phát triển bền vững, 1 quỹ đầu tư tác động. Tổ chức giả định theo đề bài.</p></div>
+    <div class="card"><h3>Hai bên thực hiện</h3><p class="muted"><b>Doanh nghiệp:</b> tiếp nhận chuyên viên tập sự, trả phụ cấp, cử người hướng dẫn. <b>Khu vực xã hội:</b> tiếp nhận dự án, đồng hướng dẫn, cùng ra đề thi.</p></div>
+  </div>
+  <div class="stack" style="gap:10px"><div class="row"><h2>Cam kết phân bổ công bằng</h2><span class="tag">Tỷ lệ là giả định của nhóm</span></div><div class="grid g3">
+    <div class="card"><h3>Mỗi suất phục vụ hai bên</h3><p class="muted">Chuyên viên tập sự nào cũng làm dự án với một tổ chức xã hội, nên bên trả nhiều tiền hơn không lấy được nhiều người hơn.</p></div>
+    <div class="card"><h3>Hội đồng ghép cặp độc lập</h3><p class="muted">Chuyên viên tập sự và đơn vị cùng xếp nguyện vọng. Bên trả phí không quyết định việc ghép.</p></div>
+    <div class="card"><h3>Giới hạn tập trung</h3><p class="muted">Không thành viên nào nhận quá 20% tổng số suất của một đợt.</p></div>
+  </div></div>
+  <div class="stack" style="gap:10px"><div class="row"><h2>Chỉ số công khai</h2><span class="tag">Mục tiêu giả định cho thí điểm 2027</span></div>
+    <div class="card scroll"><table><thead><tr><th>Chỉ số</th><th>Cách đo</th><th>Mục tiêu</th></tr></thead><tbody>
+    <tr><td>Số người nhận vai trò</td><td>Chuyên viên tập sự và thành viên Nhóm Dự án đã ký cam kết</td><td>300 người đến 12/2027 (theo đề bài)</td></tr>
+    <tr><td>Tỷ lệ còn làm sau 12 tháng</td><td>Khảo sát lại từng người sau khi kết thúc</td><td>Công bố sau đợt đầu</td></tr>
+    <tr><td>Tỷ lệ cựu thành viên quay lại</td><td>Cựu thành viên nhận việc qua cổng việc làm ESG hoặc làm người hướng dẫn</td><td>Công bố sau đợt đầu</td></tr>
+    <tr><td>Chi phí trên mỗi người</td><td>Tổng chi của Liên minh chia số người nhận vai trò</td><td>Khoảng 10 triệu đồng (3 tỷ chia 300)</td></tr>
+    </tbody></table></div></div>
+  <div class="card soft"><h3>Nguồn số liệu trên trang</h3><ul class="clean small muted"><li>ManpowerGroup &amp; Jobs_that_makesense (2024), Tìm kiếm ý nghĩa trong công việc, Việt Nam, 274 người</li><li>Anphabe (2025), Top 50 Thương hiệu nhà tuyển dụng hấp dẫn với sinh viên Việt Nam</li><li>PwC Việt Nam (2025), ESG Progress Tracker</li></ul><p class="small muted">Mọi nội dung khác (tên tổ chức, nhân vật, phụ cấp, lịch, tỷ lệ) là giả định để minh họa. Hình minh họa do nhóm tự thiết kế.</p></div>
+</div></section>
+
+</main>
+<footer><div class="wrap">Bản mẫu minh họa cho bài thi VIAC 2026. Tên tổ chức, nhân vật, thu nhập và số suất là dữ liệu giả định. Số liệu thị trường có ghi nguồn.</div></footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ===== Dữ liệu và luật ghép cặp (toàn bộ tổ chức là hư cấu) =====
+const MAJORS = {kdqt:"Kinh doanh quốc tế", tcnh:"Tài chính – Ngân hàng", mkt:"Marketing", ketoan:"Kế toán – Kiểm toán", qtkd:"Quản trị kinh doanh", kinhte:"Kinh tế", logistics:"Logistics", nhansu:"Quản trị nhân sự"};
+const STAGES = {namcuoi:"Sinh viên năm cuối", moitn:"Mới tốt nghiệp (dưới 1 năm)", dilam:"Đang đi làm (dưới 1 năm)", tren1:"Đã đi làm trên 1 năm"};
+const SKILLS = {du_lieu:"Phân tích dữ liệu", bao_cao:"Viết báo cáo, nghiên cứu", du_an:"Quản lý dự án", truyen_thong:"Truyền thông, nội dung", tai_chinh:"Mô hình tài chính", thuc_dia:"Làm việc thực địa, cộng đồng", thiet_ke:"Thiết kế sản phẩm, dịch vụ", ngoai_ngu:"Ngoại ngữ, thuyết trình"};
+const ISSUES = {khi_hau:"Biến đổi khí hậu, năng lượng", sinh_ke:"Sinh kế nông thôn", tc_toan_dien:"Tài chính toàn diện", rac_thai:"Rác thải, kinh tế tuần hoàn", giao_duc:"Giáo dục, kỹ năng", y_te:"Y tế cộng đồng", binh_dang:"Bình đẳng giới, hòa nhập", lao_dong:"Lao động, chuỗi cung ứng có trách nhiệm"};
+const TIMES = {full:"Toàn thời gian", part:"Vài giờ mỗi tuần"};
+
+const PAIRS = [
+ {id:"P01", biz:"Doanh nghiệp Nông sản xuất khẩu A", ngo:"Tổ chức Sinh kế nông hộ B", project:"truy xuất nguồn gốc và nâng thu nhập cho nông hộ nhỏ", main:"sinh_ke", sec:"lao_dong", skills:["du_lieu","thuc_dia","du_an"], fit:["kdqt","logistics","kinhte"], near:["qtkd"], slots:6, track:"ESG trong doanh nghiệp"},
+ {id:"P02", biz:"Ngân hàng C", ngo:"Tổ chức Tài chính vi mô D", project:"sản phẩm vay cho hộ kinh doanh nhỏ do phụ nữ làm chủ", main:"tc_toan_dien", sec:"binh_dang", skills:["tai_chinh","du_lieu","thiet_ke"], fit:["tcnh","kinhte"], near:["ketoan"], slots:5, track:"ESG trong doanh nghiệp"},
+ {id:"P03", biz:"Doanh nghiệp Hàng tiêu dùng E", ngo:"Doanh nghiệp xã hội Thu gom rác F", project:"mô hình thu hồi bao bì tại khu dân cư", main:"rac_thai", sec:"khi_hau", skills:["du_an","truyen_thong","thiet_ke"], fit:["mkt","qtkd"], near:["logistics"], slots:6, track:"ESG trong doanh nghiệp"},
+ {id:"P04", biz:"Doanh nghiệp Điện mặt trời G", ngo:"Tổ chức Năng lượng cộng đồng H", project:"đánh giá điện mặt trời áp mái cho hộ thu nhập thấp", main:"khi_hau", sec:"sinh_ke", skills:["du_lieu","tai_chinh","du_an"], fit:["tcnh","kinhte"], near:["qtkd"], slots:5, track:"ESG trong doanh nghiệp"},
+ {id:"P05", biz:"Doanh nghiệp Dệt may xuất khẩu I", ngo:"Tổ chức Quyền lao động J", project:"khảo sát điều kiện làm việc trong chuỗi cung ứng", main:"lao_dong", sec:"binh_dang", skills:["bao_cao","thuc_dia","ngoai_ngu"], fit:["nhansu","kdqt"], near:["qtkd"], slots:4, track:"ESG trong doanh nghiệp"},
+ {id:"P06", biz:"Doanh nghiệp Logistics K", ngo:"Doanh nghiệp xã hội Giao hàng xanh L", project:"đo và giảm phát thải chặng giao cuối", main:"khi_hau", sec:"lao_dong", skills:["du_lieu","du_an","thiet_ke"], fit:["logistics"], near:["kdqt","qtkd"], slots:4, track:"ESG trong doanh nghiệp"},
+ {id:"P07", biz:"Doanh nghiệp Thương mại điện tử M", ngo:"Tổ chức Kỹ năng số N", project:"khóa kỹ năng số cho thanh niên vùng ven", main:"giao_duc", sec:"binh_dang", skills:["thiet_ke","truyen_thong","du_an"], fit:["mkt","nhansu"], near:["qtkd"], slots:5, track:"ESG trong doanh nghiệp"},
+ {id:"P08", biz:"Chuỗi nhà thuốc O", ngo:"Tổ chức Y tế cộng đồng P", project:"chương trình sàng lọc sức khỏe cho người lao động tự do", main:"y_te", sec:"binh_dang", skills:["du_lieu","thuc_dia","truyen_thong"], fit:["qtkd","mkt"], near:["kinhte"], slots:4, track:"ESG trong doanh nghiệp"},
+ {id:"P09", biz:"Doanh nghiệp Xây dựng Q", ngo:"Tổ chức Công trình xanh R", project:"kiểm kê phát thải và báo cáo ESG cho công trình", main:"khi_hau", sec:"rac_thai", skills:["bao_cao","tai_chinh","du_lieu"], fit:["ketoan","tcnh"], near:["qtkd"], slots:3, track:"ESG trong doanh nghiệp"},
+ {id:"P10", biz:"Doanh nghiệp Du lịch S", ngo:"Doanh nghiệp xã hội Du lịch cộng đồng T", project:"phát triển tour cộng đồng do phụ nữ địa phương dẫn", main:"sinh_ke", sec:"binh_dang", skills:["truyen_thong","thuc_dia","ngoai_ngu"], fit:["mkt","kdqt"], near:["qtkd"], slots:4, track:"ESG trong doanh nghiệp"},
+ {id:"P11", biz:"Quỹ đầu tư tác động U", ngo:"Doanh nghiệp xã hội trong danh mục V", project:"thẩm định và đo tác động của khoản đầu tư", main:"tc_toan_dien", sec:"khi_hau", skills:["tai_chinh","du_lieu","bao_cao"], fit:["tcnh","ketoan"], near:["kinhte"], slots:3, track:"Impact investing"},
+ {id:"P12", biz:"Công ty tư vấn ESG W", ngo:"Quỹ cộng đồng X", project:"đo lường tác động chương trình hỗ trợ phụ nữ khởi nghiệp", main:"binh_dang", sec:"giao_duc", skills:["bao_cao","du_lieu","ngoai_ngu"], fit:["kinhte","ketoan"], near:["qtkd"], slots:4, track:"Impact consulting"}
+];
+
+// Điểm phù hợp = Vấn đề (tối đa 50) + Kỹ năng (tối đa 30) + Ngành (tối đa 20)
+function scorePair(p, a){
+  const issue = a.issue === "unsure" ? 25 : (p.main === a.issue ? 50 : (p.sec === a.issue ? 30 : 0));
+  const matched = (a.skills || []).filter(s => p.skills.includes(s));
+  const skill = Math.min(30, matched.length * 10);
+  const major = p.fit.includes(a.major) ? 20 : (p.near.includes(a.major) ? 10 : 5);
+  return {pair:p, score:issue + skill + major, issue, skill, major, matched};
+}
+
+function recommend(a, hidden){
+  if (a.stage === "tren1") return {outOfScope:true, track:trackFor(a), top:[]};
+  const pool = PAIRS.filter(p => !(hidden || []).includes(p.id));
+  const ranked = pool.map(p => scorePair(p, a)).sort((x, y) =>
+    y.score - x.score || y.matched.length - x.matched.length || inCareer(y, a) - inCareer(x, a) || y.pair.slots - x.pair.slots || x.pair.id.localeCompare(y.pair.id));
+  let top;
+  if (a.issue === "unsure"){           // 3 cặp thuộc 3 vấn đề khác nhau
+    top = []; const seen = new Set();
+    for (const r of ranked){ if (!seen.has(r.pair.main)){ top.push(r); seen.add(r.pair.main); } if (top.length === 3) break; }
+  } else top = ranked.slice(0, 3);
+  top.forEach(r => r.shown = Math.min(95, r.score));
+  return {outOfScope:false, track:trackFor(a), top, noStrong: top.length === 0 || top[0].score < 50};
+}
+
+function inCareer(r, a){ const c = (typeof CAREERS2 !== 'undefined') && CAREERS2.find(z => z.id === a.career); return c && c.pairs.includes(r.pair.id) ? 1 : 0; }
+
+function trackFor(a){
+  if (a.stage === "tren1") return {name:"Ngoài đối tượng chương trình", kind:"none", note:"Chương trình dành cho sinh viên năm cuối và người tốt nghiệp chưa quá 1 năm. Bạn có thể đăng ký làm người hướng dẫn hoặc trưởng nhóm dự án."};
+  const exp = a.exp === "co";
+  if (a.time === "part"){
+    let note = a.stage === "namcuoi" ? "Bắt đầu ngay bây giờ. Sau khi tốt nghiệp, bạn được ưu tiên xét tuyển Chuyên viên Tập sự."
+      : a.stage === "dilam" ? "Giữ công việc hiện tại, vẫn tạo tác động thật trong 3 tháng."
+      : "Thử sức 3 tháng trước khi quyết định theo Chuyên viên Tập sự.";
+    if (exp) note += " Với kinh nghiệm sẵn có, bạn có thể nhận vai trò trưởng nhóm dự án.";
+    return {name:"Nhóm Dự án Tác động", kind:"squad", fast:exp, note};
+  }
+  let note = a.stage === "namcuoi" ? "Bắt đầu sau khi tốt nghiệp. Trong lúc chờ, bạn có thể tham gia Nhóm Dự án Tác động hoặc cuộc thi tình huống."
+    : a.stage === "dilam" ? "Xét tuyển ở đợt kế tiếp. Bạn có thể bắt đầu bằng Nhóm Dự án Tác động trong lúc vẫn đi làm."
+    : "Xét tuyển ở đợt gần nhất.";
+  note = exp ? "Lộ trình nhanh: vào thẳng vòng chung kết cuộc thi tình huống. " + note : "Bắt đầu bằng 4 tuần đào tạo nền tảng trước khi về đơn vị tiếp nhận. " + note;
+  return {name:"Chuyên viên Tập sự Tác động", kind:"fellowship", fast:exp, note};
+}
+
+function reasonText(r, a){
+  const p = r.pair, parts = [];
+  if (a.issue === "unsure") parts.push("Bạn chưa chọn vấn đề, đây là một hướng về " + ISSUES[p.main].toLowerCase());
+  else if (r.issue === 50) parts.push("Bạn quan tâm " + ISSUES[a.issue].toLowerCase() + ", đúng vấn đề chính của cặp này");
+  else if (r.issue === 30) parts.push(ISSUES[a.issue] + " là vấn đề phụ của cặp này");
+  else parts.push("Cặp này làm về " + ISSUES[p.main].toLowerCase() + ", khác vấn đề bạn chọn");
+  if (r.matched.length) parts.push("kỹ năng " + r.matched.map(s => SKILLS[s].toLowerCase()).join(", ") + " của bạn khớp với dự án " + p.project);
+  else parts.push("dự án là " + p.project);
+  parts.push(r.major === 20 ? "ngành " + MAJORS[a.major] + " thuộc nhóm phù hợp nhất" : r.major === 10 ? "ngành " + MAJORS[a.major] + " thuộc nhóm gần" : "ngành " + MAJORS[a.major] + " vẫn tham gia được");
+  return parts.join("; ") + ".";
+}
+
+const PRESETS = {
+  minh:{label:"Minh, năm cuối Kinh doanh quốc tế", a:{major:"kdqt", stage:"namcuoi", skills:["du_lieu","bao_cao","du_an"], issue:"sinh_ke", time:"full"}},
+  huy:{label:"Huy, đang làm ở một công ty hàng tiêu dùng", a:{major:"mkt", stage:"dilam", skills:["truyen_thong","thiet_ke"], issue:"rac_thai", time:"part"}},
+  ngoc:{label:"Kế toán quan tâm giáo dục", a:{major:"ketoan", stage:"moitn", skills:["bao_cao","du_lieu"], issue:"giao_duc", time:"full"}},
+  an:{label:"An, chưa chắc mình quan tâm gì", a:{major:"qtkd", stage:"namcuoi", skills:["du_an","truyen_thong"], issue:"unsure", time:"part"}}
+};
+
+
+// ===== Nghề gốc và hướng bền vững (nội dung minh họa) =====
+// road: [mốc năm, chức danh, việc cần đạt]
+const CAREERS2 = [
+ {id:"xnk", major:"kdqt",
+  trad:{t:"Chuyên viên xuất nhập khẩu", d:["Làm chứng từ, hợp đồng xuất khẩu","Làm việc với khách hàng nước ngoài"], road:[["Năm 0–1","Nhân viên xuất nhập khẩu","Làm chứng từ cho từng lô hàng"],["Năm 2–3","Chuyên viên","Tự phụ trách nhóm khách hàng"],["Năm 4–6","Trưởng nhóm xuất nhập khẩu","Dẫn nhóm 3–5 người"]], pay:"10–15 triệu"},
+  impact:{t:"Chuyên viên chuỗi cung ứng bền vững", intro:"Giúp hàng xuất khẩu đáp ứng yêu cầu về nguồn gốc, môi trường và lao động của thị trường nhập khẩu.", week:["Thu thập vị trí vùng trồng và hồ sơ của nông hộ cung cấp nguyên liệu","Đánh giá nhà cung cấp theo bộ tiêu chí môi trường và lao động","Chuẩn bị hồ sơ chứng minh nguồn gốc cho lô hàng xuất khẩu","Đi thực địa cùng Tổ chức đối tác để tập huấn nông hộ"], out:"Hồ sơ truy xuất nguồn gốc cho từng lô hàng, báo cáo đánh giá nhà cung cấp", road:[["Năm 0–1","Chuyên viên chuỗi cung ứng bền vững","Làm hồ sơ truy xuất cho một ngành hàng, có người hướng dẫn"],["Năm 2–3","Chuyên viên chính","Tự phụ trách một vùng nguyên liệu, làm việc trực tiếp với khách nhập khẩu"],["Năm 4–6","Quản lý chuỗi cung ứng bền vững","Xây hệ thống truy xuất cho toàn công ty"]], pay:"12–17 triệu", w:"Doanh nghiệp nông sản, dệt may xuất khẩu"},
+  shared:["Đàm phán","Tiếng Anh thương mại","Quy trình xuất khẩu","Làm việc với đối tác"], extra:["Tiêu chuẩn truy xuất nguồn gốc"], pairs:["P01","P05"]},
+ {id:"tindung", major:"tcnh",
+  trad:{t:"Chuyên viên tín dụng doanh nghiệp", d:["Thẩm định hồ sơ vay","Quản lý danh mục khách hàng"], road:[["Năm 0–1","Chuyên viên tín dụng","Thẩm định hồ sơ vay"],["Năm 2–3","Chuyên viên chính","Quản lý danh mục khách hàng riêng"],["Năm 4–6","Trưởng phòng tín dụng","Dẫn nhóm, chịu chỉ tiêu dư nợ"]], pay:"11–16 triệu"},
+  impact:{t:"Chuyên viên tài chính xanh", intro:"Giúp ngân hàng cho vay vào các dự án xanh, đồng thời kiểm soát rủi ro môi trường và xã hội của từng khoản vay.", week:["Đọc hồ sơ vay của một dự án điện mặt trời, kiểm tra dự án có đạt tiêu chí xanh không","Chấm điểm rủi ro môi trường, xã hội cho 3–5 khoản vay doanh nghiệp","Tính lượng phát thải giảm được của danh mục vay xanh","Cùng phòng tín dụng gặp khách hàng để giới thiệu sản phẩm vay xanh"], out:"Báo cáo thẩm định khoản vay xanh, bảng chấm điểm rủi ro môi trường và xã hội", road:[["Năm 0–1","Chuyên viên tài chính xanh","Thẩm định khoản vay xanh có người hướng dẫn, học bộ tiêu chí tín dụng xanh"],["Năm 2–3","Chuyên viên chính","Tự phụ trách nhóm khách hàng, có chứng chỉ về đầu tư ESG"],["Năm 4–6","Trưởng bộ phận tài chính bền vững","Xây khung tài chính xanh cho ngân hàng, dẫn nhóm 3–5 người"]], pay:"12–18 triệu", w:"Ngân hàng, quỹ đầu tư tác động"},
+  shared:["Phân tích tài chính","Thẩm định","Mô hình tài chính","Excel"], extra:["Đánh giá rủi ro môi trường – xã hội"], pairs:["P02","P11","P04"]},
+ {id:"brand", major:"mkt",
+  trad:{t:"Chuyên viên thương hiệu", d:["Lên kế hoạch truyền thông","Nghiên cứu người tiêu dùng"], road:[["Năm 0–1","Brand Executive","Thực hiện nội dung chiến dịch"],["Năm 2–3","Senior Executive","Tự lên kế hoạch cho một nhãn hàng"],["Năm 4–6","Brand Manager","Chịu trách nhiệm cả nhãn hàng"]], pay:"10–15 triệu"},
+  impact:{t:"Chuyên viên truyền thông bền vững", intro:"Kể đúng sự thật về các chương trình bền vững của doanh nghiệp và dùng truyền thông để thay đổi hành vi người tiêu dùng.", week:["Viết nội dung về chương trình thu hồi bao bì cho mạng xã hội","Kiểm tra từng câu quảng cáo 'xanh' có số liệu chứng minh hay không","Thiết kế chiến dịch hướng dẫn phân loại rác tại một khu dân cư","Đo số hộ tham gia và báo cáo kết quả chiến dịch"], out:"Kế hoạch chiến dịch, bộ nội dung truyền thông, báo cáo kết quả có số liệu", road:[["Năm 0–1","Executive truyền thông bền vững","Thực hiện nội dung cho chiến dịch có sẵn"],["Năm 2–3","Senior Executive","Tự lên kế hoạch chiến dịch cho một nhãn hàng"],["Năm 4–6","Quản lý truyền thông bền vững","Định hướng truyền thông ESG cho toàn công ty"]], pay:"11–16 triệu", w:"Doanh nghiệp hàng tiêu dùng, doanh nghiệp xã hội"},
+  shared:["Lập kế hoạch truyền thông","Viết nội dung","Nghiên cứu người tiêu dùng"], extra:["Hiểu báo cáo ESG để tránh tẩy xanh"], pairs:["P03","P07","P10"]},
+ {id:"kiemtoan", major:"ketoan",
+  trad:{t:"Kiểm toán viên", d:["Kiểm toán báo cáo tài chính","Đối chiếu chứng từ, số liệu"], road:[["Năm 0–1","Trợ lý kiểm toán","Đối chiếu chứng từ"],["Năm 2–3","Kiểm toán viên","Phụ trách phần hành chính"],["Năm 4–6","Trưởng nhóm kiểm toán","Dẫn nhóm kiểm toán"]], pay:"10–14 triệu"},
+  impact:{t:"Chuyên viên báo cáo và đảm bảo ESG", intro:"Thu thập, kiểm tra và trình bày số liệu môi trường, xã hội để doanh nghiệp công bố minh bạch.", week:["Thu số liệu điện, nước, nhiên liệu từ các công trường","Tính lượng phát thải khí nhà kính theo hướng dẫn kiểm kê","Đối chiếu số liệu lao động, an toàn với phòng nhân sự","Soạn một mục của báo cáo phát triển bền vững"], out:"Bảng kiểm kê phát thải, một chương của báo cáo phát triển bền vững", road:[["Năm 0–1","Chuyên viên báo cáo ESG","Thu và kiểm tra số liệu, có người hướng dẫn"],["Năm 2–3","Chuyên viên chính","Tự lập báo cáo theo chuẩn GRI"],["Năm 4–6","Quản lý báo cáo ESG","Chịu trách nhiệm báo cáo toàn công ty hoặc dẫn nhóm đảm bảo ESG"]], pay:"12–17 triệu", w:"Doanh nghiệp xây dựng, sản xuất, công ty tư vấn ESG"},
+  shared:["Đối chiếu số liệu","Lập báo cáo","Kiểm soát nội bộ","Tỉ mỉ với dữ liệu"], extra:["Chuẩn báo cáo GRI","Kiểm kê phát thải"], pairs:["P09","P12"]},
+ {id:"mt", major:"qtkd",
+  trad:{t:"Quản trị viên tập sự", d:["Luân chuyển qua các phòng ban","Quản lý dự án nội bộ"], road:[["Năm 0–1","Quản trị viên tập sự","Luân chuyển 3–4 phòng ban"],["Năm 2–3","Trưởng nhóm","Phụ trách một mảng vận hành"],["Năm 4–6","Quản lý","Quản lý phòng ban"]], pay:"12–18 triệu"},
+  impact:{t:"Quản lý dự án phát triển bền vững", intro:"Biến mục tiêu ESG của doanh nghiệp thành dự án cụ thể và điều phối các phòng ban cùng thực hiện.", week:["Họp với phòng sản xuất để lên kế hoạch giảm bao bì nhựa","Theo dõi tiến độ và số liệu đầu ra của dự án hằng tuần","Làm việc với doanh nghiệp xã hội đối tác về điểm thu gom","Trình bày kết quả tháng cho ban giám đốc"], out:"Kế hoạch dự án, bảng theo dõi chỉ số, báo cáo cho ban giám đốc", road:[["Năm 0–1","Chuyên viên dự án","Điều phối một dự án nhỏ, có người hướng dẫn"],["Năm 2–3","Quản lý dự án","Phụ trách 2–3 dự án cùng lúc"],["Năm 4–6","Trưởng bộ phận phát triển bền vững","Xây chiến lược ESG cho công ty"]], pay:"12–17 triệu", w:"Doanh nghiệp hàng tiêu dùng, chuỗi bán lẻ, doanh nghiệp xã hội"},
+  shared:["Quản lý dự án","Phối hợp phòng ban","Giải quyết vấn đề","Thuyết trình"], extra:["Đo lường tác động"], pairs:["P03","P08"]},
+ {id:"nghiencuu", major:"kinhte",
+  trad:{t:"Chuyên viên nghiên cứu thị trường", d:["Thu thập, phân tích dữ liệu thị trường","Viết báo cáo cho khách hàng"], road:[["Năm 0–1","Chuyên viên","Làm khảo sát, xử lý dữ liệu"],["Năm 2–3","Chuyên viên chính","Tự thiết kế nghiên cứu"],["Năm 4–6","Quản lý nghiên cứu","Dẫn nhóm, làm việc với khách hàng"]], pay:"10–15 triệu"},
+  impact:{t:"Chuyên viên đo lường tác động", intro:"Dùng số liệu để trả lời câu hỏi: chương trình xã hội này có thật sự tạo ra thay đổi hay không.", week:["Thiết kế bảng hỏi cho phụ nữ tham gia chương trình khởi nghiệp","Phân tích dữ liệu trước và sau chương trình","Phỏng vấn người hưởng lợi tại thực địa","Viết báo cáo đánh giá cho quỹ tài trợ"], out:"Bảng hỏi, bộ dữ liệu, báo cáo đánh giá tác động", road:[["Năm 0–1","Chuyên viên đo lường tác động","Làm khảo sát và phân tích, có người hướng dẫn"],["Năm 2–3","Tư vấn viên chính","Tự thiết kế khung đánh giá cho một chương trình"],["Năm 4–6","Quản lý dự án tư vấn","Dẫn các dự án đánh giá cho quỹ và doanh nghiệp"]], pay:"11–16 triệu", w:"Công ty tư vấn ESG, quỹ cộng đồng, tổ chức phát triển"},
+  shared:["Thiết kế khảo sát","Phân tích dữ liệu","Viết báo cáo"], extra:["Khung đo lường tác động"], pairs:["P12","P02","P04"]},
+ {id:"supply", major:"logistics",
+  trad:{t:"Chuyên viên kế hoạch chuỗi cung ứng", d:["Dự báo nhu cầu, lập kế hoạch vận tải","Tối ưu chi phí kho vận"], road:[["Năm 0–1","Chuyên viên kế hoạch","Lập kế hoạch vận tải hằng tuần"],["Năm 2–3","Chuyên viên chính","Phụ trách một kho hoặc một tuyến"],["Năm 4–6","Quản lý chuỗi cung ứng","Tối ưu toàn chuỗi"]], pay:"10–15 triệu"},
+  impact:{t:"Chuyên viên logistics xanh", intro:"Đo và giảm phát thải từ vận tải, kho bãi mà vẫn giữ chi phí hợp lý.", week:["Tổng hợp quãng đường, nhiên liệu của đội xe giao hàng","Tính phát thải cho từng tuyến giao","So sánh chi phí giữa xe xăng và xe điện cho chặng cuối","Đề xuất gộp đơn để giảm số chuyến"], out:"Bảng đo phát thải theo tuyến, phương án giảm phát thải có tính chi phí", road:[["Năm 0–1","Chuyên viên logistics xanh","Đo phát thải cho một kho hoặc tuyến, có người hướng dẫn"],["Năm 2–3","Chuyên viên chính","Tự triển khai phương án giảm phát thải"],["Năm 4–6","Quản lý logistics bền vững","Đặt mục tiêu phát thải cho toàn mạng lưới"]], pay:"11–16 triệu", w:"Doanh nghiệp logistics, thương mại điện tử"},
+  shared:["Tối ưu vận tải","Phân tích dữ liệu","Lập kế hoạch"], extra:["Kiểm kê phát thải"], pairs:["P06","P01"]},
+ {id:"tuyendung", major:"nhansu",
+  trad:{t:"Chuyên viên tuyển dụng", d:["Tuyển dụng, phỏng vấn ứng viên","Xây thương hiệu tuyển dụng"], road:[["Năm 0–1","Chuyên viên tuyển dụng","Tuyển cho 1–2 phòng ban"],["Năm 2–3","Chuyên viên chính","Phụ trách tuyển dụng một khối"],["Năm 4–6","HR Business Partner","Tư vấn nhân sự cho ban lãnh đạo khối"]], pay:"9–14 triệu"},
+  impact:{t:"Chuyên viên lao động có trách nhiệm", intro:"Bảo đảm người lao động trong công ty và trong chuỗi cung ứng được đối xử công bằng, an toàn.", week:["Phỏng vấn công nhân tại xưởng may của nhà cung cấp","Kiểm tra giờ làm, lương, an toàn theo bộ tiêu chí","Đề xuất kế hoạch khắc phục cho nhà cung cấp","Thiết kế chương trình hòa nhập cho lao động nữ"], out:"Báo cáo đánh giá nhà cung cấp, kế hoạch khắc phục", road:[["Năm 0–1","Chuyên viên lao động có trách nhiệm","Đánh giá nhà cung cấp, có người hướng dẫn"],["Năm 2–3","Chuyên viên chính","Tự phụ trách một nhóm nhà cung cấp"],["Năm 4–6","Quản lý trách nhiệm xã hội","Xây chính sách lao động cho toàn chuỗi"]], pay:"10–15 triệu", w:"Doanh nghiệp dệt may, thương mại điện tử, tổ chức xã hội lao động"},
+  shared:["Phỏng vấn","Hiểu luật lao động","Giao tiếp","Xây chính sách"], extra:["Tiêu chuẩn lao động quốc tế"], pairs:["P05","P07"]}
+];
+const overlapPct = c => Math.round(c.shared.length / (c.shared.length + c.extra.length) * 100);
+const EXPS = {chua:"Chưa có kinh nghiệm thực tế", co:"Đã có kinh nghiệm: thực tập, dự án thật, việc bán thời gian hoặc đi làm dưới 1 năm"};
+PRESETS.minh.a.career = "xnk"; PRESETS.minh.a.exp = "chua";
+PRESETS.huy.a.career = "brand"; PRESETS.huy.a.exp = "co";
+PRESETS.ngoc.a.career = "kiemtoan"; PRESETS.ngoc.a.exp = "co";
+PRESETS.an.a.career = "mt"; PRESETS.an.a.exp = "chua";
+
+if (typeof module !== "undefined") module.exports = {recommend, PAIRS, CAREERS2, overlapPct};
+
+</script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.display = "none", 3200); }
+document.addEventListener("click", e => { const b = e.target.closest("[data-toast]"); if (b) toast(b.dataset.toast); });
+
+const VIEWS = ["trang-chu","nghe","lo-trinh","cuoc-thi","squad","fellowship","hanh-trinh","doi-tac","gioi-thieu"];
+function route(){
+  let h = location.hash.replace("#",""); if (!VIEWS.includes(h)) h = "trang-chu";
+  VIEWS.forEach(v => $("#v-" + v).classList.toggle("on", v === h));
+  document.querySelectorAll(".links a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + h));
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+
+const careerById = id => CAREERS2.find(c => c.id === id);
+
+// ---------- Thẻ nghề ----------
+function tileHTML(c, sel){
+  return `<button class="ctile${sel ? " sel" : ""}" data-career="${c.id}" aria-pressed="${!!sel}"><span class="small muted">${MAJORS[c.major]}</span><span class="from">${c.trad.t}</span><span class="to">→ ${c.impact.t}</span><span class="small muted">Dùng lại khoảng ${overlapPct(c)}% kỹ năng</span></button>`;
+}
+$("#homeTiles").innerHTML = CAREERS2.map(c => tileHTML(c, false)).join("");
+$("#homeTiles").addEventListener("click", e => { const b = e.target.closest("[data-career]"); if (b) startWithCareer(b.dataset.career); });
+
+// ---------- So sánh hai hướng ----------
+function roadHTML(road){ return `<div class="road">${road.map(r => `<div><span class="yr">${r[0]}</span><b>${r[1]}</b><span class="small muted">${r[2]}</span></div>`).join("")}</div>`; }
+function compareHTML(c){
+  const pct = overlapPct(c);
+  return `<div class="vs">
+    <div class="card side"><span class="eyebrow" style="color:var(--muted)">Hướng truyền thống</span><h3>${c.trad.t}</h3>
+      <ul class="clean muted small">${c.trad.d.map(x => `<li>${x}</li>`).join("")}</ul>
+      <b class="small">Lộ trình theo năm</b>${roadHTML(c.trad.road)}
+      <p class="small"><b>Thu nhập năm đầu:</b> ${c.trad.pay} <span class="tag">Minh họa</span></p></div>
+    <div class="mid"><div class="meter" style="--p:${pct}"><span>${pct}%</span></div><p class="small"><b>kỹ năng dùng lại được</b></p></div>
+    <div class="card side impact"><span class="eyebrow">Hướng bền vững (ESG)</span><h3>${c.impact.t}</h3>
+      <p>${c.impact.intro}</p>
+      <b class="small">Một tuần làm việc điển hình</b>
+      <ul class="clean small">${c.impact.week.map(x => `<li>${x}</li>`).join("")}</ul>
+      <p class="small"><b>Sản phẩm bạn làm ra:</b> ${c.impact.out}</p>
+      <b class="small">Lộ trình theo năm</b>${roadHTML(c.impact.road)}
+      <p class="small"><b>Thu nhập năm đầu:</b> ${c.impact.pay} <span class="tag">Minh họa</span></p>
+      <p class="small muted"><b>Nơi làm việc:</b> ${c.impact.w}</p></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card soft"><b>Kỹ năng bạn mang theo</b><div class="row">${c.shared.map(x => `<span class="chip">✓ ${x}</span>`).join("")}</div></div>
+    <div class="card soft"><b>Cần học thêm</b><div class="row">${c.extra.map(x => `<span class="chip">+ ${x}</span>`).join("")}</div><p class="small muted">Có trong đào tạo chung hằng tháng của Chuyên viên Tập sự.</p></div>
+  </div>
+  <p class="small muted" style="margin-top:8px">Tỷ lệ dùng lại = số kỹ năng mang theo được chia cho tổng số kỹ năng cần cho hướng bền vững. Mốc năm là ví dụ, tùy năng lực và đơn vị.</p>`;
+}
+
+// ---------- Vòng phát triển ----------
+const LOOP = [
+ {t:"Chưa có kinh nghiệm", d:"Bắt đầu từ nghề bạn muốn"},
+ {t:"Được đào tạo", d:"Nhóm Dự án hoặc Chuyên viên Tập sự, hai người hướng dẫn"},
+ {t:"Có kinh nghiệm", d:"Chứng nhận Lộ trình Tác động chứng nhận"},
+ {t:"Quay lại với Lộ trình Tác động", d:"Cổng việc làm ESG cho cựu thành viên"},
+ {t:"Việc làm ESG", d:"Tại thành viên và đối tác của Liên minh"}
+];
+function loopHTML(active, label){
+  return `<div class="loop">${LOOP.map((n, i) => `<div class="node${i === active ? " on" : ""}"><span class="n">${i + 1}</span><b>${n.t}</b><span class="small">${n.d}</span>${i === active ? `<span class="here">${label || "Bạn ở đây"}</span>` : ""}</div>`).join("")}</div>
+  <div class="loopback">↺ Cựu thành viên quay lại làm người hướng dẫn cho khóa sau, vòng tiếp tục với người mới</div>
+  <p class="small muted">Bước 4 là ưu tiên giới thiệu và ưu tiên phỏng vấn, không bảo đảm có việc làm.</p>`;
+}
+$("#homeLoop").innerHTML = loopHTML(-1);
+
+let viewCareer = CAREERS2[0].id;
+function renderCompare(){
+  $("#careerTabs").innerHTML = CAREERS2.map(c => `<button role="tab" aria-selected="${c.id === viewCareer}" class="${c.id === viewCareer ? "on" : ""}" data-c="${c.id}">${c.trad.t}</button>`).join("");
+  const c = careerById(viewCareer);
+  $("#compareBox").innerHTML = compareHTML(c) + `<div class="row" style="margin-top:16px"><button class="btn alt" data-career="${c.id}">Định hướng tiếp với nghề này</button></div>`;
+}
+$("#careerTabs").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b){ viewCareer = b.dataset.c; renderCompare(); } });
+$("#compareBox").addEventListener("click", e => { const b = e.target.closest("[data-career]"); if (b) startWithCareer(b.dataset.career); });
+
+// ---------- Cuộc thi ----------
+const CASE_IDS = ["P01","P02","P03"];
+const CASE_TITLES = {P01:"Giảm rủi ro chuỗi cung ứng cho nông hộ nhỏ", P02:"Thiết kế sản phẩm vay cho hộ kinh doanh nhỏ do phụ nữ làm chủ", P03:"Mô hình thu hồi bao bì tại khu dân cư"};
+const CASE_BG = {P01:"#E6EFE4", P02:"#DCEBF2", P03:"#FFF1E4"};
+$("#cases").innerHTML = CASE_IDS.map(id => { const p = PAIRS.find(x => x.id === id); return `<div class="card lift"><div class="pic"><svg viewBox="0 0 400 200"><rect width="400" height="200" fill="${CASE_BG[id]}"/><g transform="translate(40,40)"><use href="#s-office" width="120" height="120"/></g><g transform="translate(240,50)"><use href="#s-village" width="120" height="120"/></g><path d="M150 150 Q200 110 250 150" fill="none" stroke="#E0702A" stroke-width="7" stroke-linecap="round"/></svg></div><span class="chip" style="align-self:flex-start">${ISSUES[p.main]}</span><h3>${CASE_TITLES[id]}</h3><p class="muted small">${p.biz} + ${p.ngo}</p><p class="small"><b>Đầu ra:</b> bản đề xuất 5 trang và 10 phút trình bày</p><p class="small"><b>Giải thưởng:</b> ${p.slots} suất Chuyên viên Tập sự <span class="tag">Minh họa</span></p><button class="btn sm" data-toast="Đã ghi nhận đăng ký đội (bản minh họa, không gửi dữ liệu).">Đăng ký đội</button></div>`; }).join("");
+
+$("#f-issue").innerHTML = Object.values(ISSUES).map(v => `<option>${v}</option>`).join("");
+$("#pform").addEventListener("submit", e => { e.preventDefault(); $("#pmsg").textContent = "Đã nhận thông tin của " + $("#f-org").value + " trên màn hình này. Bản minh họa không gửi dữ liệu đi đâu."; });
+
+// ---------- Định hướng: 6 bước ----------
+const QS = [
+ {key:"career", q:"Bạn đang nhắm tới nghề nào?", hint:"Chọn nghề gần nhất với dự định của bạn. Chưa cần nghĩ đến ESG."},
+ {key:"compare", q:"Nghề của bạn có hai hướng đi"},
+ {key:"stage", q:"Bạn đang ở giai đoạn nào?", opts:STAGES},
+ {key:"exp", q:"Bạn đã có kinh nghiệm làm việc chưa?", hint:"Kinh nghiệm gồm thực tập, dự án thật, việc bán thời gian hoặc đi làm dưới 1 năm.", opts:EXPS},
+ {key:"skills", q:"Bạn mạnh ở kỹ năng nào?", hint:"Chọn tối đa 3", multi:true, opts:Object.assign({}, SKILLS, {none:"Tôi chưa rõ thế mạnh của mình"})},
+ {key:"issue", q:"Nếu công việc của bạn giải quyết được một vấn đề, bạn muốn đó là vấn đề nào?", opts:Object.assign({}, ISSUES, {unsure:"Tôi chưa chắc"})},
+ {key:"time", q:"Bạn có thể dành bao nhiêu thời gian?", opts:TIMES}
+];
+let step = 0, ans = {skills:[]}, hideP03 = false;
+
+function startWithCareer(id){
+  ans = {skills:[], career:id, major:careerById(id).major}; hideP03 = false; step = 1;
+  $("#result").innerHTML = "";
+  if (location.hash !== "#lo-trinh") location.hash = "lo-trinh";
+  renderQuiz();
+}
+function renderQuiz(){
+  const el = $("#quiz");
+  if (step >= QS.length){ el.innerHTML = `<div class="row"><b>Đã hoàn thành định hướng.</b><button class="btn sm ghost" id="again">Làm lại</button></div>`; $("#again").onclick = resetQuiz; return; }
+  const Q = QS[step];
+  let body = "";
+  if (Q.key === "career"){
+    body = `<div class="ctiles">${CAREERS2.map(c => tileHTML(c, ans.career === c.id)).join("")}</div>`;
+  } else if (Q.key === "compare"){
+    const c = careerById(ans.career);
+    body = `<p class="muted">Bạn chọn <b>${c.trad.t}</b>. Đây là hướng bền vững của chính nghề đó: làm gì mỗi tuần và mất bao lâu để lên từng vị trí.</p>${compareHTML(c)}<button class="btn alt" id="next" style="align-self:flex-start">Tìm vai trò phù hợp với tôi</button>`;
+  } else {
+    body = `<div class="opts">${Object.entries(Q.opts).map(([k, v]) => `<button class="opt${isSel(Q, k) ? " sel" : ""}" data-k="${k}" aria-pressed="${isSel(Q, k)}">${v}</button>`).join("")}</div>${Q.multi ? '<button class="btn" id="next" style="align-self:flex-start">Tiếp tục</button>' : ""}`;
+  }
+  el.innerHTML = `<div class="row" style="justify-content:space-between"><span class="small muted">Bước ${step + 1} / ${QS.length}</span>${step ? '<button class="btn sm ghost" id="back">Quay lại</button>' : ""}</div>
+    <div class="progress"><div style="width:${step / QS.length * 100}%"></div></div>
+    <h2>${Q.q}</h2>${Q.hint ? `<p class="muted small">${Q.hint}</p>` : ""}${body}`;
+  el.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(Q, b.dataset.k));
+  el.querySelectorAll(".ctile").forEach(b => b.onclick = () => { ans.career = b.dataset.career; ans.major = careerById(ans.career).major; step = 1; renderQuiz(); });
+  if ($("#back")) $("#back").onclick = () => { step--; renderQuiz(); };
+  if ($("#next")) $("#next").onclick = () => {
+    if (Q.key === "skills" && !ans.skills.length && !ans.noSkill){ toast("Chọn ít nhất một kỹ năng, hoặc chọn 'Tôi chưa rõ thế mạnh của mình'."); return; }
+    step++; renderQuiz();
+  };
+}
+function isSel(Q, k){ if (Q.multi) return k === "none" ? !!ans.noSkill : ans.skills.includes(k); return ans[Q.key] === k; }
+function pick(Q, k){
+  if (Q.multi){
+    if (k === "none"){ ans.noSkill = !ans.noSkill; ans.skills = []; }
+    else { ans.noSkill = false; const i = ans.skills.indexOf(k); if (i >= 0) ans.skills.splice(i, 1); else if (ans.skills.length < 3) ans.skills.push(k); else toast("Tối đa 3 kỹ năng. Bỏ chọn một kỹ năng để đổi."); }
+    renderQuiz(); return;
+  }
+  ans[Q.key] = k; step++; renderQuiz();
+  if (step >= QS.length) showResult();
+}
+function resetQuiz(){ step = 0; ans = {skills:[]}; hideP03 = false; $("#result").innerHTML = ""; renderQuiz(); }
+
+function showResult(){
+  const r = recommend(ans, hideP03 ? ["P03"] : []), out = $("#result"), c = careerById(ans.career);
+  const summary = `<div class="row">${[c.trad.t, STAGES[ans.stage], ans.exp === "co" ? "Đã có kinh nghiệm" : "Chưa có kinh nghiệm", ...(ans.skills.length ? ans.skills.map(s => SKILLS[s]) : ["Chưa rõ thế mạnh"]), ans.issue === "unsure" ? "Chưa chắc vấn đề" : ISSUES[ans.issue], TIMES[ans.time]].map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
+  const careerCard = `<div class="card soft"><div class="row" style="justify-content:space-between"><div><span class="small muted">Nghề bạn chọn → hướng bền vững</span><h3>${c.trad.t} <span class="muted">→</span> ${c.impact.t}</h3></div><div class="meter sm" style="--p:${overlapPct(c)}"><span>${overlapPct(c)}%</span></div></div><p class="small muted">Bạn dùng lại được khoảng ${overlapPct(c)}% kỹ năng. Cần học thêm: ${c.extra.join(", ").toLowerCase()}.</p>${roadHTML(c.impact.road)}</div>`;
+  if (r.outOfScope){
+    out.innerHTML = `<h2>Kết quả</h2>${summary}${careerCard}<div class="notice"><b>${r.track.name}.</b> ${r.track.note}</div><div class="row"><a class="btn" href="#squad">Xem Nhóm Dự án Tác động</a><a class="btn ghost" href="#doi-tac">Trang đối tác</a></div>`;
+    out.scrollIntoView({behavior:"smooth", block:"start"}); return;
+  }
+  const lead = r.top[0];
+  let notes = "";
+  if (ans.issue === "unsure") notes += `<div class="notice">Bạn chưa chọn vấn đề. Đây là 3 hướng khác nhau để bạn khám phá.</div>`;
+  if (ans.noSkill) notes += `<div class="notice">Bạn chưa rõ thế mạnh. Nhóm Dự án Tác động là cách tốt để tìm ra: 3 tháng làm dự án thật theo nhóm.</div>`;
+  if (r.noStrong) notes += `<div class="notice"><b>Chưa có cặp thật sự phù hợp ở đợt này</b> (mức cao nhất dưới 50%). Bạn có thể đăng ký Nhóm Dự án Tác động và nhận thông báo khi có đề bài mới.</div>`;
+  out.innerHTML = `<h2>Gợi ý cho bạn</h2>${summary}${careerCard}
+    <div class="card brand"><span class="small muted">Lộ trình đề xuất</span><h2 style="color:#fff">${r.track.name}${lead && !r.noStrong ? " · hướng " + lead.pair.track : ""}</h2><p>${r.track.note}</p></div>
+    <div class="card"><h3>Vị trí của bạn trên vòng phát triển</h3>${loopHTML(ans.exp === "co" ? 2 : 0, ans.exp === "co" ? "Bạn bắt đầu ở đây: lộ trình nhanh" : "Bạn bắt đầu ở đây")}</div>
+    ${notes}
+    <div class="row"><h3>3 cặp đơn vị phù hợp nhất</h3><span class="tag">Tổ chức hư cấu</span></div>
+    ${r.top.map(x => `<div class="card lift"><div class="match"><div class="pct">${x.shown}%</div><div class="stack" style="gap:8px">
+      <div class="row"><h3>${x.pair.biz} + ${x.pair.ngo}</h3>${c.pairs.includes(x.pair.id) ? '<span class="chip">Gần với nghề bạn chọn</span>' : ""}</div>
+      <p class="muted">${esc(reasonText(x, ans))}</p>
+      <div class="bar"><div style="width:${x.shown}%"></div></div>
+      <div class="row small muted"><span>Vấn đề ${x.issue}/50</span><span>·</span><span>Kỹ năng ${x.skill}/30</span><span>·</span><span>Ngành ${x.major}/20</span><span>·</span><span>Còn ${x.pair.slots} suất</span></div>
+      <div class="row"><a class="btn sm" href="${r.track.kind === "squad" ? "#squad" : "#cuoc-thi"}">${r.track.kind === "squad" ? "Đăng ký Nhóm Dự án Tác động" : "Thi tình huống của cặp này"}</a></div>
+    </div></div></div>`).join("")}
+    <div class="card soft small"><b>Điểm phù hợp được tính thế nào?</b><p class="muted">Vấn đề quan tâm tối đa 50 điểm (trùng vấn đề chính 50, vấn đề phụ 30). Kỹ năng tối đa 30 điểm (10 điểm mỗi kỹ năng khớp). Ngành học tối đa 20 điểm. Mức hiển thị cao nhất là 95%. Không dùng bảng điểm hay xếp loại học lực.</p>
+    <div class="row"><button class="btn sm ghost" id="again2">Làm lại</button><label style="display:flex;gap:8px;align-items:center;margin:0;font-weight:500"><input type="checkbox" id="hide" style="width:auto"${hideP03 ? " checked" : ""}> Giả lập cặp E + F đã hết suất</label></div></div>`;
+  $("#again2").onclick = resetQuiz;
+  $("#hide").onchange = e => { hideP03 = e.target.checked; showResult(); };
+  out.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+$("#presets").innerHTML = Object.entries(PRESETS).map(([k, p]) => `<button class="btn sm ghost" data-p="${k}">${p.label}</button>`).join("");
+$("#presets").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (!b) return; const a = PRESETS[b.dataset.p].a; ans = {career:a.career, major:a.major, exp:a.exp, stage:a.stage, skills:a.skills.slice(), issue:a.issue, time:a.time}; hideP03 = false; step = QS.length; renderQuiz(); showResult(); });
+
+renderCompare(); renderQuiz(); route();
+</script>
+</body>
+</html>
